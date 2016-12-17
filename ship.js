@@ -3,11 +3,14 @@
 // http://patreon.com/codingrainbow
 // Code for: https://youtu.be/hacZU523FyM
 
-function Ship(pos, r, shieldDuration) {
-  Entity.call(this, width / 2, height / 2, 20);
-  this.inFlux = false;
-  this.lives = 3;
+function Ship(world, params) {
+  Entity.call(this, params.pos, params.r);
+  this.lives = params.lives !== undefined ? params.lives : 3;
+  var shieldDuration = params.shieldDuration !== undefined ? params.shieldDuration : 180;
   this.shields = shieldDuration;
+  this.brokenParts = [];
+  this.inFlux = false;
+  var resetPos = this.pos.copy();
   var destroyFramesReset = 200;
   var respawnFramesReset = 300;
   var destroyFrames;
@@ -16,21 +19,15 @@ function Ship(pos, r, shieldDuration) {
   this.registerId = function(id) {
     Entity.prototype.registerId.call(this, id);
     var scope = this;
-    input.registerListener(id, " ".charCodeAt(0), function(char, code, press) {
-      if (!press) {
-        return;
+    world.registerListener(this, " ".charCodeAt(0), function(char, code, press) {
+      if (press) {
+        world.addEndFrameTask(function (world) { world.createEntity(Laser, { pos: p5.Vector.fromAngle(scope.heading).mult(scope.r).add(scope.pos), heading: scope.heading }); });
       }
-
-      var laser = new Laser(p5.Vector.fromAngle(scope.heading).mult(scope.r).add(scope.pos), scope.heading);
-      playSoundEffect(laserSoundEffect);
-      entitymanager.add(laser);
     });
-    input.registerListener(id, RIGHT_ARROW, function(char, code, press) { scope.setRotation(press ? 0.08 : 0); });
-    input.registerListener(id, LEFT_ARROW, function(char, code, press) { scope.setRotation(press ? -0.08 : 0); });
-    input.registerListener(id, UP_ARROW, function(char, code, press) { scope.setAccel(press ? 0.1 : 0); });
+    world.registerListener(this, RIGHT_ARROW, function(char, code, press) { scope.setRotation(press ? 0.08 : 0); });
+    world.registerListener(this, LEFT_ARROW, function(char, code, press) { scope.setRotation(press ? -0.08 : 0); });
+    world.registerListener(this, UP_ARROW, function(char, code, press) { scope.setAccel(press ? 0.1 : 0); });
   }
-
-  this.brokenParts = [];
 
   this.collides = function(entity) {
     if (this.inFlux || this.shields > 0 ||
@@ -62,7 +59,7 @@ function Ship(pos, r, shieldDuration) {
       this.lives--;
       // TODO: Do something with this variable.
       if (this.lives === 0) {
-        levelmanager.gameover = true;
+        world.gameover = true;
       }
 
       this.inFlux = true;
@@ -102,7 +99,7 @@ function Ship(pos, r, shieldDuration) {
         this.inFlux = false;
         this.regenShields();
         this.brokenParts.length = 0;
-        this.pos.set(width / 2, height / 2);
+        this.pos.set(resetPos.x, resetPos.y);
         this.vel.set(0, 0);
       }
 

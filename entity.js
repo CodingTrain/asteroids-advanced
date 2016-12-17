@@ -1,8 +1,8 @@
-function Entity(x, y, radius)
+function Entity(pos, radius)
 {
   this.id = -1;
   this.dead = false;
-  this.pos = createVector(x, y);
+  this.pos = pos;
   this.r = radius;
   this.heading = 0;
   this.rotation = 0;

@@ -3,31 +3,27 @@
 // http://patreon.com/codingrainbow
 // Code for: https://youtu.be/hacZU523FyM
 
-function Asteroid(pos, r, size, levelmanager) {
-  pos = pos !== undefined ? pos : createVector(random(width), random(height));
-  Entity.call(this, pos.x, pos.y, r !== undefined ? r : random(40, 60));
-  this.size = size !== undefined ? size : 1;
-
+function Asteroid(world, params) {
+  var pos = params.pos !== undefined ? params.pos : createVector(random(width), random(height));
+  var levelmanager = params.levelmanager;
+  Entity.call(this, pos, params.r !== undefined ? params.r : random(40, 60));
+  this.size = params.size !== undefined ? params.size : 1;
   this.vel = p5.Vector.random2D();
   this.total = floor(random(7, 15));
+  this.offset = [];
+  levelmanager.recordAsteroidCreation();
+  Entity.prototype.setRotation.call(this, random(-0.03, 0.03));
+  for (var i = 0; i < this.total; i++) {
+    this.offset[i] = random(-this.r * 0.75, 0);
+  }
 
-  //smaller asteroids go a bit faster
-  switch(size) {
+  // Smaller asteroids go a bit faster.
+  switch(this.size) {
     case 0:
       this.vel.mult(2); break;
     case 1:
       this.vel.mult(1.5); break;
   }
-
-
-  this.offset = [];
-  for (var i = 0; i < this.total; i++) {
-    this.offset[i] = random(-this.r * 0.75, 0);
-  }
-
-  Entity.prototype.setRotation.call(this, random(-0.03, 0.03));
-
-  levelmanager.recordAsteroidCreation();
 
   this.render = function() {
     push();
@@ -64,8 +60,11 @@ function Asteroid(pos, r, size, levelmanager) {
       this.dead = true;
       playSoundEffect(explosionSoundEffects[floor(random(0,explosionSoundEffects.length))]);
       if (size !== 0) {
-        entitymanager.add(new Asteroid(this.pos, this.r * 0.5, this.size - 1, levelmanager));
-        entitymanager.add(new Asteroid(this.pos, this.r * 0.5, this.size - 1, levelmanager));
+        var scope = this;
+        world.addEndFrameTask(function() {
+          world.createEntity(Asteroid, { pos: scope.pos.copy(), r: scope.r * 0.5, size: scope.size - 1, levelmanager: levelmanager });
+          world.createEntity(Asteroid, { pos: scope.pos.copy(), r: scope.r * 0.5, size: scope.size - 1, levelmanager: levelmanager });
+        });
       }
 
       levelmanager.recordKill(this);
