@@ -20,7 +20,6 @@ function preload() {
 }
 var score = 0;
 var lives = 3;
-var points = [100, 50, 20]; // small, med, large points
 var level = 0;
 
 function setup() {
@@ -58,7 +57,7 @@ function draw() {
     for (var j = asteroids.length - 1; j >= 0; j--) {
       if (lasers[i].hits(asteroids[j])) {
         asteroids[j].playSoundEffect(explosionSoundEffects);
-        score += points[asteroids[j].size];
+        score += ceil(600 / asteroids[j].r);
         var newAsteroids = asteroids[j].breakup();
         asteroids = asteroids.concat(newAsteroids);
         asteroids.splice(j, 1);
@@ -92,7 +91,7 @@ function draw() {
 
 function spawnAsteroids() {
   for(var i = 0; i < level + 5; i++) {
-    asteroids.push(new Asteroid(null, null, 2));
+    asteroids.push(new Asteroid());
   }
 }
 

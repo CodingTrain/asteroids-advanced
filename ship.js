@@ -4,7 +4,7 @@
 // Code for: https://youtu.be/hacZU523FyM
 
 function Ship(pos, r) {
-  Entity.call(this, width / 2, height / 2, 20);
+  Entity.call(this, createVector(width / 2, height / 2), 100, 20);
   this.isDestroyed = false;
   this.destroyFrames = 600;
   this.shields = shieldTime;
@@ -19,20 +19,33 @@ function Ship(pos, r) {
       laser.playSoundEffect(laserSoundEffect);
       lasers.push(laser);
   });
-  input.registerAsListener(RIGHT_ARROW, function(char, code, press) { scope.setRotation(press ? 0.08 : 0); });
-  input.registerAsListener(LEFT_ARROW, function(char, code, press) { scope.setRotation(press ? -0.08 : 0); });
-  input.registerAsListener(UP_ARROW, function(char, code, press) { scope.setAccel(press ? 0.1 : 0); });
+
+  this.LEFT = false;
+  this.RIGHT = false;
+  this.UP = false;
+  input.registerAsListener(RIGHT_ARROW, function(char, code, press) { scope.RIGHT = press; });
+  input.registerAsListener(LEFT_ARROW, function(char, code, press) { scope.LEFT = press; });
+  input.registerAsListener(UP_ARROW, function(char, code, press) { scope.UP = press; });
 
   this.update = function() {
+    if (this.LEFT) this.applyTorque(-0.7);
+    if (this.RIGHT) this.applyTorque(0.7);
+    if (this.UP) {
+      var force = p5.Vector.fromAngle(this.heading);
+      force.mult(10);
+      this.applyForce(force);
+    }
+    var force = this.vel.copy();
+    force.mult(-0.2 * this.vel.mag());
+    this.applyForce(force);
+    this.applyTorque(-50 * this.rotation * this.rotation * (this.rotation > 0 ? 1 : -1));
+
     Entity.prototype.update.call(this);
-    this.vel.mult(0.99);
     if(this.isDestroyed) {
       for(var i = 0; i < this.brokenParts.length; i++) {
         this.brokenParts[i].pos.add(this.brokenParts[i].vel);
         this.brokenParts[i].heading += this.brokenParts[i].rot;
       }
-    } else {
-      this.vel.mult(0.99);
     }
     if (this.shields > 0) {
       this.shields -= 1;
@@ -60,14 +73,15 @@ function Ship(pos, r) {
       createVector(this.pos.x - 2/3 * this.r, this.pos.y + this.r),
       createVector(this.pos.x + 4/3 * this.r, this.pos.y + 0)
     ];
-    var asteroid_vertices = asteroid.vertices();
+    var asteroid_vertices = asteroid.vertices;
     for(var i = 0; i < asteroid_vertices.length; i++) {
       for(var j = 0; j < vertices.length; j++) {
-        var opposite = vertices.slice(0);
-        opposite.splice(j, 1);
-        if(lineIntersect(opposite[0], opposite[1], asteroid_vertices[i], asteroid_vertices[(i + 1) % asteroid_vertices.length])) {
+        aVert = asteroid_vertices[i].copy();
+        aVert.add(asteroid.pos);
+        bVert = asteroid_vertices[(i + 1) % asteroid_vertices.length].copy();
+        bVert.add(asteroid.pos);
+        if(lineIntersect(vertices[j], vertices[(j + 1) % vertices.length], aVert, bVert))
           return true;
-        }
       }
     }
     return false;
@@ -93,7 +107,7 @@ function Ship(pos, r) {
       stroke(shieldCol, shieldCol, 255);
       triangle(-2/3*this.r, -this.r, -2/3*this.r, this.r, 4/3*this.r, 0);
 
-      if(this.accelMagnitude != 0) {
+      if(this.UP) {
         translate(-this.r, 0);
         rotate(random(PI / 4, 3 * PI / 4));
         line(0, 0, 0, 10);
