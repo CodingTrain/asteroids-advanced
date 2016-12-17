@@ -59,7 +59,7 @@ function Asteroid(world, params) {
     if (!this.dead && entity.toString() === "[object Laser]") {
       this.dead = true;
       playSoundEffect(explosionSoundEffects[floor(random(0,explosionSoundEffects.length))]);
-      if (size !== 0) {
+      if (this.size > 0) {
         var scope = this;
         world.addEndFrameTask(function() {
           world.createEntity(Asteroid, { pos: scope.pos.copy(), r: scope.r * 0.5, size: scope.size - 1, levelmanager: levelmanager });
