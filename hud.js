@@ -1,17 +1,14 @@
-function Hud() {
-  var score = 0;
-  var points = [100, 50, 20]; // small, med, large points
-  var level = 0;
+function Hud(levelmanager, ship) {
   var size = 20;
   var padding = 10;
   var lifeWidth = 20;
 
   /*
-   --0--
-   1   2
-   --3--
-   4   5
-   --6--
+  --0--
+  1   2
+  --3--
+  4   5
+  --6--
   */
   var digitMaps = [
     //return a digit map
@@ -28,22 +25,8 @@ function Hud() {
 
   ];
 
-  this.recordKill = function(asteroid) {
-    score += points[asteroid.size];
-  }
-
-  this.update = function() {
-    if(asteroids.length == 0) {
-      level++;
-      ship.regenShields();
-      for(var i = 0; i < level + 5; i++) {
-        asteroids.push(new Asteroid(undefined, undefined, 2));
-      }
-    }
-  }
-
   this.render = function() {
-    var scoreString = "" + score;
+    var scoreString = "" + levelmanager.getScore();
     var digitPos = createVector((width / 2 - (scoreString.length * (size + padding)) / 2), padding);
     for(var i = 0; i < scoreString.length; i++) {
       var dmap = digitMaps[scoreString.charAt(i)];
@@ -51,7 +34,7 @@ function Hud() {
       digitPos.x += size + padding;
     }
     drawLives();
-    if(ship.lives < 0) {
+    if(levelmanager.gameover) {
       push();
       textSize(32);
       fill(255);
@@ -76,8 +59,9 @@ function Hud() {
     push();
     stroke(255);
     for(var i = 0; i < digitMap.length; i++) {
-      if(digitMap[i] === true)
+      if(digitMap[i] === true) {
         drawLine(i, pos);
+      }
     }
     pop();
   }

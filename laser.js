@@ -13,6 +13,12 @@ function Laser(spos, angle) {
   this.vel.mult(10);
   this.color = colors[floor(random(0,colors.length-1))];
 
+  this.update = function() {
+    if (Entity.prototype.update.call(this) || this.offscreen()) {
+      return true;
+    }
+  }
+
   this.render = function() {
     push();
     stroke(this.color[0], this.color[1], this.color[2]);
@@ -21,15 +27,16 @@ function Laser(spos, angle) {
     pop();
   }
 
-  this.playSoundEffect = function(sound){
-    if (!sound.isPlaying()){
-      sound.play();
+  this.collides = function(entity) {
+    if (entity.toString() !== "[object Asteroid]" ||
+        !Entity.prototype.collides.call(this, entity)){
+      return false;
     }
-  }
 
-  this.hits = function(asteroid) {
     var last_pos = p5.Vector.sub(this.pos, this.vel);
-    var asteroid_vertices = asteroid.vertices();
+    var last_angle = p5.Vector.sub(last_pos, entity.pos).heading();
+    var new_angle = p5.Vector.sub(this.pos, entity.pos).heading();
+    var asteroid_vertices = entity.vertices(last_angle, new_angle);
     for(var i = 0; i < asteroid_vertices.length - 1; i++) {
       if(lineIntersect(last_pos, this.pos, asteroid_vertices[i], asteroid_vertices[i + 1])) {
         return true;
@@ -48,7 +55,13 @@ function Laser(spos, angle) {
     return false;
   }
 
+  this.collision = function(entity) {
+    if (entity.toString() === "[object Asteroid]") {
+      this.dead = true;
+    }
+  }
 
+  this.toString = function() { return "[object Laser]"; }
 }
 
 Laser.prototype = Object.create(Entity.prototype);
