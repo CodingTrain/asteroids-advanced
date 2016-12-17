@@ -3,33 +3,41 @@
 // http://patreon.com/codingrainbow
 // Code for: https://youtu.be/hacZU523FyM
 
-function Asteroid(pos, r, size) {
-  if (pos == null) {
+function Asteroid(pos, r, force, vertices) {
+  //If position is not defined, assign a random position
+  if (pos)
+    pos = pos.copy();
+  else
     pos = createVector(random(width), random(height));
+  //If radius is not defined, assign a random radius
+  if (!r)
+    r = random(40, 60);
+
+  if (!force)
+    force = 5000;
+
+  Entity.call(this, pos, 4 * r * r, r);
+
+  var vForce = p5.Vector.random2D();
+  vForce.mult(force);
+  Entity.prototype.applyForce.call(this, vForce);
+
+  if (vertices) {
+    this.vertices = vertices;
+    this.error = cos(TWO_PI / vertices);
+  } else {
+    var vertCount = floor(random(7, 15));
+    var a = TWO_PI / vertCount;
+    this.error = cos(a);
+    this.vertices = [];
+    for (var i = 0; i < vertCount; i++) {
+      var vert = p5.Vector.fromAngle(a*i);
+      vert.mult(r + random(-this.r * 0.2, this.r * 0.5));
+      this.vertices.push(vert);
+    }
   }
 
-  r = r != null ? r * 0.5 : random(40, 60);
-  Entity.call(this, pos.x, pos.y, r);
-
-  this.vel = p5.Vector.random2D();
-  this.total = floor(random(7, 15));
-
-  //smaller asteroids go a bit faster
-  this.size = size;
-  switch(size) {
-    case 1:
-      this.vel.mult(1.5); break;
-    case 0:
-      this.vel.mult(2); break;
-  }
-
-
-  this.offset = [];
-  for (var i = 0; i < this.total; i++) {
-    this.offset[i] = random(-this.r * 0.2, this.r * 0.5);
-  }
-
-  Entity.prototype.setRotation.call(this, random(-0.03, 0.03));
+  Entity.prototype.applyTorque.call(this, random(-1, 1));
 
   this.render = function() {
     push();
@@ -38,10 +46,8 @@ function Asteroid(pos, r, size) {
     translate(this.pos.x, this.pos.y);
     rotate(this.heading);
     beginShape();
-    for (var i = 0; i < this.total; i++) {
-      var angle = map(i, 0, this.total, 0, TWO_PI);
-      var r = this.r + this.offset[i];
-      vertex(r * cos(angle), r * sin(angle));
+    for (var i = 0; i < this.vertices.length; i++) {
+      vertex(this.vertices[i].x, this.vertices[i].y);
     }
     endShape(CLOSE);
     pop();
@@ -52,21 +58,11 @@ function Asteroid(pos, r, size) {
   }
 
   this.breakup = function() {
-    if(size > 0)
-      return [new Asteroid(this.pos, this.r, this.size-1), new Asteroid(this.pos, this.r, this.size-1)];
-    else
-      return [];
-  }
-
-  this.vertices = function() {
-    var vertices = []
-    for(var i = 0; i < this.total; i++) {
-      var angle = this.heading + map(i, 0, this.total, 0, TWO_PI);
-      var r = this.r + this.offset[i];
-      vertices.push(p5.Vector.add(createVector(r * cos(angle), r * sin(angle)), this.pos));
-    }
-
-    return vertices;
+    if(this.r > 20) {
+      var asteroid = new Asteroid(this.pos.copy(), this.r / 2, force * 0.5);
+      var asteroid2 = new Asteroid(this.pos.copy(), this.r / 2, force * 0.5);
+      return [asteroid, asteroid2];
+    } else return [];
   }
 }
 

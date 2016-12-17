@@ -1,28 +1,39 @@
-function Entity(x, y, radius)
-{
-  this.pos = createVector(x, y);
-  this.r = radius;
+function Entity(pos, mass, radius) {
+  this.pos = pos;
+  this.mass = mass;
   this.heading = 0;
-  this.rotation = 0;
+  this.r = radius;
+
   this.vel = createVector(0, 0);
-  this.accelMagnitude = 0;
+  this.rotation = 0;
+
+  this.force = createVector(0, 0);
+  this.torque = 0;
 }
 
 Entity.prototype.update = function() {
-  this.heading += this.rotation;
+  //Calculate acceleration from force
+  var accel = this.force;
+  accel.div(this.mass);
+  var torAccel = this.torque / this.mass;
 
-  // Accelerate using the heading and the accelMagnitude
-  var force = p5.Vector.fromAngle(this.heading);
-  force.mult(this.accelMagnitude);
-  this.vel.add(force);
+  this.vel.add(accel);
+  this.rotation += torAccel;
 
   this.pos.add(this.vel);
+  this.heading += this.rotation;
+
   this.edges();
+  this.force.mult(0);
+  this.torque = 0;
 }
 
-Entity.prototype.setAccel = function(magnitude)
-{
-  this.accelMagnitude = magnitude;
+Entity.prototype.applyForce = function(force) {
+  this.force.add(force);
+}
+
+Entity.prototype.applyTorque = function(torque) {
+  this.torque += torque;
 }
 
 Entity.prototype.edges = function() {
@@ -36,8 +47,4 @@ Entity.prototype.edges = function() {
   } else if (this.pos.y < -this.r) {
     this.pos.y = height + this.r;
   }
-}
-
-Entity.prototype.setRotation = function(rot) {
-  this.rotation = rot;
 }
