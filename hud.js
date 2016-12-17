@@ -1,4 +1,7 @@
 function Hud() {
+  var score = 0;
+  var points = [100, 50, 20]; // small, med, large points
+  var level = 0;
   var size = 20;
   var padding = 10;
   var lifeWidth = 20;
@@ -25,6 +28,20 @@ function Hud() {
 
   ];
 
+  this.recordKill = function(asteroid) {
+    score += points[asteroid.size];
+  }
+
+  this.update = function() {
+    if(asteroids.length == 0) {
+      level++;
+      ship.regenShields();
+      for(var i = 0; i < level + 5; i++) {
+        asteroids.push(new Asteroid(undefined, undefined, 2));
+      }
+    }
+  }
+
   this.render = function() {
     var scoreString = "" + score;
     var digitPos = createVector((width / 2 - (scoreString.length * (size + padding)) / 2), padding);
@@ -34,7 +51,7 @@ function Hud() {
       digitPos.x += size + padding;
     }
     drawLives();
-    if(lives < 0) {
+    if(ship.lives < 0) {
       push();
       textSize(32);
       fill(255);
@@ -47,7 +64,7 @@ function Hud() {
     stroke(255);
     fill(0);
     var top = createVector((width / 2) + lifeWidth * 2, padding * 2 + size * 2);
-    for(var i = 0; i < lives; i++) {
+    for(var i = 0; i < ship.lives; i++) {
       triangle(top.x, top.y, top.x - lifeWidth / 2, top.y + 25, top.x + lifeWidth / 2, top.y + 25);
       top.x -= 20 + padding;
     }

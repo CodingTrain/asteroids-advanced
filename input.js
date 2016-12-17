@@ -1,8 +1,5 @@
 var input = {
   listeners: {},
-  reset: function() {
-    this.listeners = {};
-  },
   registerAsListener: function(index, callback) {
     if (this.listeners[index] == undefined) {
       this.listeners[index] = [];

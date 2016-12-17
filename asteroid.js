@@ -4,11 +4,8 @@
 // Code for: https://youtu.be/hacZU523FyM
 
 function Asteroid(pos, r, size) {
-  if (pos == null) {
-    pos = createVector(random(width), random(height));
-  }
-
-  r = r != null ? r * 0.5 : random(40, 60);
+  pos = pos !== undefined ? pos : createVector(random(width), random(height));
+  r = r !== undefined ? r : random(40, 60);
   Entity.call(this, pos.x, pos.y, r);
 
   this.vel = p5.Vector.random2D();
@@ -53,7 +50,7 @@ function Asteroid(pos, r, size) {
 
   this.breakup = function() {
     if(size > 0)
-      return [new Asteroid(this.pos, this.r, this.size-1), new Asteroid(this.pos, this.r, this.size-1)];
+      return [new Asteroid(this.pos, this.r * 0.5, this.size-1), new Asteroid(this.pos, this.r * 0.5, this.size-1)];
     else
       return [];
   }

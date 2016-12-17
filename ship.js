@@ -3,11 +3,13 @@
 // http://patreon.com/codingrainbow
 // Code for: https://youtu.be/hacZU523FyM
 
-function Ship(pos, r) {
-  Entity.call(this, width / 2, height / 2, 20);
+function Ship(pos, r, shieldDuration) {
+  Entity.call(this, pos.x, pos.y, r);
   this.isDestroyed = false;
   this.destroyFrames = 600;
-  this.shields = shieldTime;
+  this.shields = shieldDuration;
+  this.lives = 3;
+  this.inFlux = false;
 
   var scope = this;
   input.registerAsListener(" ".charCodeAt(0), function(char, code, press) {
@@ -26,7 +28,7 @@ function Ship(pos, r) {
   this.update = function() {
     Entity.prototype.update.call(this);
     this.vel.mult(0.99);
-    if(this.isDestroyed) {
+    if(this.inFlux) {
       for(var i = 0; i < this.brokenParts.length; i++) {
         this.brokenParts[i].pos.add(this.brokenParts[i].vel);
         this.brokenParts[i].heading += this.brokenParts[i].rot;
@@ -34,6 +36,7 @@ function Ship(pos, r) {
     } else {
       this.vel.mult(0.99);
     }
+
     if (this.shields > 0) {
       this.shields -= 1;
     }
@@ -41,20 +44,35 @@ function Ship(pos, r) {
 
   this.brokenParts = [];
   this.destroy = function() {
-    this.isDestroyed = true;
+    this.inFlux = true;
     for(var i = 0; i < 4; i++)
       this.brokenParts[i] = {
-        pos: this.pos.copy(),
-        vel: p5.Vector.random2D(),
-        heading: random(0, 360),
-        rot: random(-0.07, 0.07)
-      };
+      pos: this.pos.copy(),
+      vel: p5.Vector.random2D(),
+      heading: random(0, 360),
+      rot: random(-0.07, 0.07)
+    };
+    var scope = this;
+    setTimeout(function() {
+      scope.lives--;
+      scope.brokenParts.length = 0;
+      if(scope.lives >= 0) {
+        scope.pos.set(pos.x, pos.y);
+        scope.vel.set(0, 0);
+        scope.inFlux = false;
+      }
+    }, 3000);
+  }
+
+  this.regenShields = function() {
+    this.shields = shieldDuration;
   }
 
   this.hits = function(asteroid) {
-    if (this.shields > 0) {
+    if (this.inFlux || this.shields > 0) {
       return false;
     }
+
     var vertices = [
       createVector(this.pos.x - 2/3 * this.r, this.pos.y - this.r),
       createVector(this.pos.x - 2/3 * this.r, this.pos.y + this.r),
@@ -74,7 +92,7 @@ function Ship(pos, r) {
   }
 
   this.render = function() {
-    if(this.isDestroyed) {
+    if(this.inFlux) {
       for(var i = 0; i < this.brokenParts.length; i++) {
         push();
         stroke(floor(255 * ((this.destroyFrames--) / 600)));
@@ -89,7 +107,7 @@ function Ship(pos, r) {
       translate(this.pos.x, this.pos.y);
       rotate(this.heading);
       fill(0);
-      var shieldCol = random(map(this.shields, 0, shieldTime, 255, 0), 255);
+      var shieldCol = random(map(this.shields, 0, shieldDuration, 255, 0), 255);
       stroke(shieldCol, shieldCol, 255);
       triangle(-2/3*this.r, -this.r, -2/3*this.r, this.r, 4/3*this.r, 0);
 
