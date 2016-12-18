@@ -1,13 +1,26 @@
-function World(width, height) {
+function World(width, height, viewSize) {
   this.width = width;
   this.height = height;
+  this.halfwidth = width / 2;
+  this.halfheight = height / 2;
+
 
   var hud;
   var levelmanager;
   var entitymanager = new EntityManager();
   var endFrameTasks = [];
+  var players = [];
 
-  this.gameover = false;
+  // Returns the player playing on this machine.
+  // TODO: Currently returns the first player as we only have one.
+  this.getLocalPlayer = function() {
+    return players[0];
+  }
+
+  // Returns the player with the specific id.
+  this.getPlayer = function(id) {
+    return players[id];
+  }
 
   // Adds a function to a stack, will be called at the end of the frame once
   // all the other logic is completed.
@@ -35,17 +48,17 @@ function World(width, height) {
 
   // Initializes the world.
   this.initialize = function() {
-    var ship = new Ship(this, { pos: createVector(width / 2, height / 2), r: 20, shieldDuration: 180 });
-    entitymanager.add(ship);
-    levelmanager = new LevelManager(this, ship, 0);
-    hud = new Hud(this, levelmanager, ship);
+    players[0] = new Player(players.length, "SomeRandomName", this);
+    entitymanager.add(players[0].getEntity());
+    levelmanager = new LevelManager(this, players[0].getEntity(), 0);
+    hud = new Hud(this, levelmanager, players[0].getEntity());
   }
 
   // Does all the update logic for this frame.
   this.update = function() {
     entitymanager.update();
     entitymanager.checkCollisions();
-    levelmanager.update();
+    levelmanager.update(players);
     for (var i = 0; i < endFrameTasks.length; i++) {
       endFrameTasks[i](this);
     }
@@ -55,8 +68,17 @@ function World(width, height) {
 
   // Does all the rendering for this frame.
   this.render = function() {
+    push();
     background(0);
+    push();
+    stroke(255, 255, 255);
+    strokeWeight(10);
+    line(-world.halfwidth , -world.halfheight, world.halfwidth, -world.halfheight);
+    line(-world.halfwidth, world.halfheight, world.halfwidth, world.halfheight);
+    line(-world.halfwidth, -world.halfheight, -world.halfwidth, world.halfheight);
+    line(world.halfwidth, -world.halfheight, world.halfwidth, world.halfheight);
+    pop();
     entitymanager.render();
-    hud.render();
+    pop();
   }
 }

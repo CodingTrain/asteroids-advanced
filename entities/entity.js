@@ -1,14 +1,15 @@
-function Entity(pos, radius)
+function Entity(params)
 {
   this.id = -1;
   this.canCollide = true;
   this.dead = false;
-  this.pos = pos;
-  this.r = radius;
+  this.pos = params.pos;
+  this.r = params.r;
   this.heading = 0;
   this.rotation = 0;
   this.vel = createVector(0, 0);
   this.accelMagnitude = 0;
+  this.owner = params.owner !== undefined ? params.owner : -1;
 }
 
 Entity.prototype.registerId = function(id) {
@@ -21,15 +22,15 @@ Entity.prototype.setAccel = function(magnitude)
 }
 
 Entity.prototype.edges = function() {
-  if (this.pos.x > width + this.r) {
-    this.pos.x = -this.r;
-  } else if (this.pos.x < -this.r) {
-    this.pos.x = width + this.r;
+  if (this.pos.x > world.halfwidth + this.r) {
+    this.pos.x = -(this.r + world.halfwidth);
+  } else if (this.pos.x < -(this.r + world.halfwidth)) {
+    this.pos.x = world.halfwidth + this.r;
   }
-  if (this.pos.y > height + this.r) {
-    this.pos.y = -this.r;
-  } else if (this.pos.y < -this.r) {
-    this.pos.y = height + this.r;
+  if (this.pos.y > world.halfheight + this.r) {
+    this.pos.y = -(this.r + world.halfheight);
+  } else if (this.pos.y < -(this.r + world.halfheight)) {
+    this.pos.y = world.halfheight + this.r;
   }
 }
 
