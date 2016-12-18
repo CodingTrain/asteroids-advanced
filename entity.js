@@ -1,6 +1,7 @@
 function Entity(pos, radius)
 {
   this.id = -1;
+  this.canCollide = true;
   this.dead = false;
   this.pos = pos;
   this.r = radius;
@@ -36,8 +37,8 @@ Entity.prototype.setRotation = function(rot) {
   this.rotation = rot;
 }
 
-// TODO: Maybe move this to a shape class of some kind so that every entity stores a class that holds all the geometry?
 Entity.prototype.collides = function(entity) {
+  if (!(this.canCollide && entity.canCollide)) return false;
   var dx = this.pos.x - entity.pos.x;
   var dy = this.pos.y - entity.pos.y;
   var dr = this.r + entity.r;

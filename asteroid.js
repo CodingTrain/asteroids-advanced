@@ -9,22 +9,18 @@ function Asteroid(world, params) {
   Entity.call(this, pos, params.r !== undefined ? params.r : random(40, 60));
   this.size = params.size !== undefined ? params.size : 1;
   this.vel = p5.Vector.random2D();
-  this.total = floor(random(7, 15));
 
-  var max_r = -1;
-  this.vertices = [];
-  for (var i = 0; i < this.total; i++) {
-    var angle = map(i, 0, this.total, 0, TWO_PI);
-    r = this.r + random(-this.r * 0.2, this.r * 0.5);
-    this.vertices.push(createVector(r * cos(angle), r * sin(angle)));
-    if(r > max_r) {
-      max_r = r;
-    }
+  var total = floor(random(7, 15));
+  var range = this.r * 0.5;
+  vertices = [];
+  for (var i = 0; i < total; i++) {
+    var angle = map(i, 0, total, 0, TWO_PI);
+    r = this.r - random(0, range);
+    vertices.push(createVector(r * cos(angle), r * sin(angle)));
   }
+  this.shape = new Shape(vertices);
   levelmanager.recordAsteroidCreation();
   Entity.prototype.setRotation.call(this, random(-0.03, 0.03));
-  this.r = max_r;
-
 
   // Smaller asteroids go a bit faster.
   switch(this.size) {
@@ -36,32 +32,21 @@ function Asteroid(world, params) {
 
   this.render = function() {
     push();
-    stroke(255);
+    stroke(255, 255, 255, this.shape.fade());
     noFill();
     translate(this.pos.x, this.pos.y);
     rotate(this.heading);
-    beginShape();
-    for (var i = 0; i < this.vertices.length; i++) {
-      vertex(this.vertices[i].x, this.vertices[i].y);
-    }
-    endShape(CLOSE);
+    if (!this.shape.draw()) this.dead = true;
     pop();
   }
 
-  this.globalVertices = function() {
-    var glob_vertices = [];
-    for (var i = 0; i < this.vertices.length; i++) {
-      glob_vertices.push(this.vertices[i].copy().rotate(this.heading).add(this.pos));
-    }
-    return glob_vertices;
-  }
-
-  // Asteroid only cares about lasers and they do the check.
   this.collides = function() {}
 
   this.collision = function(entity) {
     if (!this.dead && entity.toString() === "[object Laser]") {
-      this.dead = true;
+      this.shape.breakAnime();
+      this.canCollide = false;
+      this.rotation = 0;
       playSoundEffect(explosionSoundEffects[floor(random(0,explosionSoundEffects.length))]);
       if (this.size > 0) {
         var scope = this;
@@ -73,6 +58,10 @@ function Asteroid(world, params) {
 
       levelmanager.recordKill(this);
     }
+  }
+
+  this.globalVertices = function() {
+    return this.shape.globalVertices(this.pos, this.heading);
   }
 
   this.toString = function() { return "[object Asteroid]"; }
