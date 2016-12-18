@@ -12,7 +12,7 @@ function Laser(world, params) {
   this.vel.mult(10);
   this.color = colors[floor(random(0,colors.length-1))];
 
-  playSoundEffect(laserSoundEffect);
+  playSoundEffect(laserSoundEffect[floor(random(3))]);
 
   this.update = function() {
     if (Entity.prototype.update.call(this) || this.offscreen()) {
