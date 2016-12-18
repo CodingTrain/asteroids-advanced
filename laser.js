@@ -48,7 +48,7 @@ function Laser(spos, angle) {
 
   this.hits = function(asteroid) {
     var last_pos = p5.Vector.sub(this.pos, this.vel);
-    var asteroid_vertices = asteroid.vertices();
+    var asteroid_vertices = asteroid.globalVertices();
     for (var i = 0; i < asteroid_vertices.length; i++) {
       if (lineIntersect(last_pos, this.pos, asteroid_vertices[i], asteroid_vertices[(i + 1) % asteroid_vertices.length])) {
         return true;

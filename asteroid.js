@@ -25,13 +25,18 @@ function Asteroid(pos, r, size) {
       break;
   }
 
-
-  this.vertices_ = [];
+  
+  var max_r = -1;
+  this.vertices = [];
   for (var i = 0; i < this.total; i++) {
-    var angle = this.heading + map(i, 0, this.total, 0, TWO_PI);
+    var angle = map(i, 0, this.total, 0, TWO_PI);
     r = this.r + random(-this.r * 0.2, this.r * 0.5);
-    this.vertices_.push(createVector(r * cos(angle), r * sin(angle)));
+    this.vertices.push(createVector(r * cos(angle), r * sin(angle)));
+    if(r > max_r) {
+      max_r = r;
+    }
   }
+  this.r = max_r;
 
 
   Entity.prototype.setRotation.call(this, random(-0.03, 0.03));
@@ -43,8 +48,8 @@ function Asteroid(pos, r, size) {
     translate(this.pos.x, this.pos.y);
     rotate(this.heading);
     beginShape();
-    for (var i = 0; i < this.vertices_.length; i++) {
-      vertex(this.vertices_[i].x, this.vertices_[i].y);
+    for (var i = 0; i < this.vertices.length; i++) {
+      vertex(this.vertices[i].x, this.vertices[i].y);
     }
     endShape(CLOSE);
     pop();
@@ -61,12 +66,12 @@ function Asteroid(pos, r, size) {
       return [];
   }
 
-  this.vertices = function() {
-    var vertices = [];
-    for (var i = 0; i < this.vertices_.length; i++) {
-      vertices.push(this.vertices_[i].copy().rotate(this.heading).add(this.pos));
+  this.globalVertices = function() {
+    var glob_vertices = [];
+    for (var i = 0; i < this.vertices.length; i++) {
+      glob_vertices.push(this.vertices[i].copy().rotate(this.heading).add(this.pos));
     }
-    return vertices;
+    return glob_vertices;
   }
 
 }
