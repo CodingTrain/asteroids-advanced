@@ -32,7 +32,8 @@ function setup() {
   world.initialize();
 
   localplayerentity = world.getLocalPlayer().getEntity();
-  uimanager.add(new Hud());
+  uimanager.create(Hud);
+  uimanager.create(PlayerControls);
 }
 
 function draw() {

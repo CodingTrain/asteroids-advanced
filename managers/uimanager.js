@@ -1,8 +1,8 @@
 function UIManager(world, viewSize) {
   var uiElements = [];
 
-  this.add = function(uiElement) {
-    uiElements.push(uiElement);
+  this.create = function(constructor, params) {
+    uiElements.push(new constructor(uiElements.length, params));
   }
 
   this.update = function() {

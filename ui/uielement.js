@@ -1,4 +1,4 @@
-function UIElement(params) {
+function UIElement(id, params) {
   this.pos = params.pos !== undefined ? params.pos : createVector(0, 0);
 }
 

@@ -35,9 +35,7 @@ function Laser(world, params) {
   playSoundEffect(laserSoundEffect[floor(random(3))]);
 
   this.update = function() {
-    if (Entity.prototype.update.call(this) || this.offscreen()) {
-      return true;
-    }
+    return Entity.prototype.update.call(this);
   }
 
   this.render = function() {
@@ -61,16 +59,6 @@ function Laser(world, params) {
       if(lineIntersect(last_pos, this.pos, asteroid_vertices[i], asteroid_vertices[(i + 1) % asteroid_vertices.length])) {
         return true;
       }
-    }
-    return false;
-  }
-
-  this.offscreen = function() {
-    if (this.pos.x > width || this.pos.x < 0) {
-      return true;
-    }
-    if (this.pos.y > height || this.pos.y < 0) {
-      return true;
     }
     return false;
   }

@@ -1,5 +1,5 @@
-function Hud() {
-  UIElement.call(this, { pos: createVector(0, 0) });
+function Hud(id) {
+  UIElement.call(this, id, { pos: createVector(0, 0) });
   var size = 20;
   var padding = 10;
   var lifeWidth = 20;
