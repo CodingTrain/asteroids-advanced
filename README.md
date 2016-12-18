@@ -10,7 +10,7 @@ This repo is for the Asteroids project from Coding Challenge 45.
 3. Stay tuned for Siraj's tutorial!
 
 ### Play the game!
-* https://codingrainbow.github.io/Asteroids/
+* https://codingrainbow.github.io/asteroids-advanced/
 
 ### Info
 
