@@ -55,8 +55,6 @@ function Laser(world, params) {
     }
 
     var last_pos = p5.Vector.sub(this.pos, this.vel);
-    var last_angle = p5.Vector.sub(last_pos, entity.pos).heading();
-    var new_angle = p5.Vector.sub(this.pos, entity.pos).heading();
     var asteroid_vertices = entity.globalVertices();
     for(var i = 0; i < asteroid_vertices.length - 1; i++) {
       if(lineIntersect(last_pos, this.pos, asteroid_vertices[i], asteroid_vertices[(i + 1) % asteroid_vertices.length])) {
