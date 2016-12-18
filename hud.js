@@ -1,14 +1,14 @@
-function Hud() {
+function Hud(world, levelmanager, ship) {
   var size = 20;
   var padding = 10;
   var lifeWidth = 20;
 
   /*
-   --0--
-   1   2
-   --3--
-   4   5
-   --6--
+  --0--
+  1   2
+  --3--
+  4   5
+  --6--
   */
   var digitMaps = [
     //return a digit map
@@ -26,15 +26,15 @@ function Hud() {
   ];
 
   this.render = function() {
-    var scoreString = "" + score;
-    var digitPos = createVector((width / 2 - (scoreString.length * (size + padding)) / 2), padding);
+    var scoreString = "" + levelmanager.getScore();
+    var digitPos = createVector((width / 2 - (scoreString.length * (size + padding) - padding) / 2), padding);
     for(var i = 0; i < scoreString.length; i++) {
       var dmap = digitMaps[scoreString.charAt(i)];
       drawDigit(dmap, i, digitPos);
       digitPos.x += size + padding;
     }
     drawLives();
-    if(lives < 0) {
+    if(world.gameover) {
       push();
       textSize(32);
       fill(255);
@@ -46,10 +46,10 @@ function Hud() {
     push();
     stroke(255);
     fill(0);
-    var top = createVector((width / 2) + lifeWidth * 2, padding * 2 + size * 2);
-    for(var i = 0; i < lives; i++) {
+    var top = createVector((width / 2) + (lifeWidth + padding) * (ship.lives - 1) / 2, padding * 2 + size * 2);
+    for(var i = 0; i < ship.lives; i++) {
       triangle(top.x, top.y, top.x - lifeWidth / 2, top.y + 25, top.x + lifeWidth / 2, top.y + 25);
-      top.x -= 20 + padding;
+      top.x -= lifeWidth + padding;
     }
     pop();
   }
@@ -59,8 +59,9 @@ function Hud() {
     push();
     stroke(255);
     for(var i = 0; i < digitMap.length; i++) {
-      if(digitMap[i] === true)
+      if(digitMap[i] === true) {
         drawLine(i, pos);
+      }
     }
     pop();
   }
