@@ -24,13 +24,20 @@ var colors = [
   [68, 34, 153]
 ]
 
-function Laser(spos, angle) {
-  Entity.call(this, spos.x, spos.y, 4);
+function Laser(world, params) {
+  Entity.call(this, params.pos, 4);
 
-  this.pos = createVector(spos.x, spos.y);
-  this.vel = p5.Vector.fromAngle(angle);
+  this.vel = p5.Vector.fromAngle(params.heading);
   this.vel.mult(10);
   this.color = colors[floor(random(0, colors.length - 1))];
+
+  playSoundEffect(laserSoundEffect);
+
+  this.update = function() {
+    if (Entity.prototype.update.call(this) || this.offscreen()) {
+      return true;
+    }
+  }
 
   this.render = function() {
     push();
@@ -40,17 +47,19 @@ function Laser(spos, angle) {
     pop();
   }
 
-  this.playSoundEffect = function(sound) {
-    if (!sound.isPlaying()) {
-      sound.play();
-    }
-  }
 
-  this.hits = function(asteroid) {
+  this.collides = function(entity) {
+    if (entity.toString() !== "[object Asteroid]" ||
+        !Entity.prototype.collides.call(this, entity)){
+      return false;
+    }
+
     var last_pos = p5.Vector.sub(this.pos, this.vel);
-    var asteroid_vertices = asteroid.globalVertices();
-    for (var i = 0; i < asteroid_vertices.length; i++) {
-      if (lineIntersect(last_pos, this.pos, asteroid_vertices[i], asteroid_vertices[(i + 1) % asteroid_vertices.length])) {
+    var last_angle = p5.Vector.sub(last_pos, entity.pos).heading();
+    var new_angle = p5.Vector.sub(this.pos, entity.pos).heading();
+    var asteroid_vertices = entity.globalVertices();
+    for(var i = 0; i < asteroid_vertices.length - 1; i++) {
+      if(lineIntersect(last_pos, this.pos, asteroid_vertices[i], asteroid_vertices[(i + 1) % asteroid_vertices.length])) {
         return true;
       }
     }
@@ -67,7 +76,13 @@ function Laser(spos, angle) {
     return false;
   }
 
+  this.collision = function(entity) {
+    if (entity.toString() === "[object Asteroid]") {
+      this.dead = true;
+    }
+  }
 
+  this.toString = function() { return "[object Laser]"; }
 }
 
 Laser.prototype = Object.create(Entity.prototype);

@@ -1,6 +1,8 @@
-function Entity(x, y, radius)
+function Entity(pos, radius)
 {
-  this.pos = createVector(x, y);
+  this.id = -1;
+  this.dead = false;
+  this.pos = pos;
   this.r = radius;
   this.heading = 0;
   this.rotation = 0;
@@ -8,16 +10,8 @@ function Entity(x, y, radius)
   this.accelMagnitude = 0;
 }
 
-Entity.prototype.update = function() {
-  this.heading += this.rotation;
-
-  // Accelerate using the heading and the accelMagnitude
-  var force = p5.Vector.fromAngle(this.heading);
-  force.mult(this.accelMagnitude);
-  this.vel.add(force);
-
-  this.pos.add(this.vel);
-  this.edges();
+Entity.prototype.registerId = function(id) {
+  this.id = id;
 }
 
 Entity.prototype.setAccel = function(magnitude)
@@ -40,4 +34,39 @@ Entity.prototype.edges = function() {
 
 Entity.prototype.setRotation = function(rot) {
   this.rotation = rot;
+}
+
+// TODO: Maybe move this to a shape class of some kind so that every entity stores a class that holds all the geometry?
+Entity.prototype.collides = function(entity) {
+  var dx = this.pos.x - entity.pos.x;
+  var dy = this.pos.y - entity.pos.y;
+  var dr = this.r + entity.r;
+  return dx * dx + dy * dy <= dr * dr;
+}
+
+Entity.prototype.collision = function() {}
+
+Entity.prototype.update = function() {
+  if (this.dead) {
+    return true;
+  }
+
+  this.heading += this.rotation;
+  // Accelerate using the heading and the accelMagnitude
+  var force = p5.Vector.fromAngle(this.heading);
+  force.mult(this.accelMagnitude);
+  this.vel.add(force);
+
+  this.pos.add(this.vel);
+  this.edges();
+}
+
+Entity.prototype.render = function() {
+  push();
+  translate(this.pos.x, this.pos.y);
+  rotate(this.heading);
+  fill(0);
+  stroke(255);
+  ellipse(this.pos.x, this.pos.y, this.r);
+  pop();
 }

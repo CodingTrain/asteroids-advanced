@@ -3,29 +3,14 @@
 // http://patreon.com/codingrainbow
 // Code for: https://youtu.be/hacZU523FyM
 
-function Asteroid(pos, r, size) {
-  if (pos == null) {
-    pos = createVector(random(width), random(height));
-  }
-
-  r = r != null ? r * 0.5 : random(40, 60);
-  Entity.call(this, pos.x, pos.y, r);
-
+function Asteroid(world, params) {
+  var pos = params.pos !== undefined ? params.pos : createVector(random(width), random(height));
+  var levelmanager = params.levelmanager;
+  Entity.call(this, pos, params.r !== undefined ? params.r : random(40, 60));
+  this.size = params.size !== undefined ? params.size : 1;
   this.vel = p5.Vector.random2D();
   this.total = floor(random(7, 15));
 
-  //smaller asteroids go a bit faster
-  this.size = size;
-  switch (size) {
-    case 1:
-      this.vel.mult(1.5);
-      break;
-    case 0:
-      this.vel.mult(2);
-      break;
-  }
-
-  
   var max_r = -1;
   this.vertices = [];
   for (var i = 0; i < this.total; i++) {
@@ -36,10 +21,18 @@ function Asteroid(pos, r, size) {
       max_r = r;
     }
   }
+  levelmanager.recordAsteroidCreation();
+  Entity.prototype.setRotation.call(this, random(-0.03, 0.03));
   this.r = max_r;
 
 
-  Entity.prototype.setRotation.call(this, random(-0.03, 0.03));
+  // Smaller asteroids go a bit faster.
+  switch(this.size) {
+    case 0:
+      this.vel.mult(2); break;
+    case 1:
+      this.vel.mult(1.5); break;
+  }
 
   this.render = function() {
     push();
@@ -55,17 +48,6 @@ function Asteroid(pos, r, size) {
     pop();
   }
 
-  this.playSoundEffect = function(soundArray) {
-    soundArray[floor(random(0, soundArray.length))].play();
-  }
-
-  this.breakup = function() {
-    if (size > 0)
-      return [new Asteroid(this.pos, this.r, this.size - 1), new Asteroid(this.pos, this.r, this.size - 1)];
-    else
-      return [];
-  }
-
   this.globalVertices = function() {
     var glob_vertices = [];
     for (var i = 0; i < this.vertices.length; i++) {
@@ -74,6 +56,26 @@ function Asteroid(pos, r, size) {
     return glob_vertices;
   }
 
+  // Asteroid only cares about lasers and they do the check.
+  this.collides = function() {}
+
+  this.collision = function(entity) {
+    if (!this.dead && entity.toString() === "[object Laser]") {
+      this.dead = true;
+      playSoundEffect(explosionSoundEffects[floor(random(0,explosionSoundEffects.length))]);
+      if (this.size > 0) {
+        var scope = this;
+        world.addEndFrameTask(function() {
+          world.createEntity(Asteroid, { pos: scope.pos.copy(), r: scope.r * 0.5, size: scope.size - 1, levelmanager: levelmanager });
+          world.createEntity(Asteroid, { pos: scope.pos.copy(), r: scope.r * 0.5, size: scope.size - 1, levelmanager: levelmanager });
+        });
+      }
+
+      levelmanager.recordKill(this);
+    }
+  }
+
+  this.toString = function() { return "[object Asteroid]"; }
 }
 
 Asteroid.prototype = Object.create(Entity.prototype);
