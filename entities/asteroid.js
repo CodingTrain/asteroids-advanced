@@ -4,9 +4,10 @@
 // Code for: https://youtu.be/hacZU523FyM
 
 function Asteroid(world, params) {
-  var pos = params.pos !== undefined ? params.pos : createVector(random(width), random(height));
   var levelmanager = params.levelmanager;
-  Entity.call(this, pos, params.r !== undefined ? params.r : random(40, 60));
+  params.pos = params.pos !== undefined ? params.pos : createVector(random(-world.halfwidth, world.halfwidth), random(-world.halfheight, world.halfheight));
+  params.r = params.r !== undefined ? params.r : random(40, 60);
+  Entity.call(this, params);
   this.size = params.size !== undefined ? params.size : 1;
   this.vel = p5.Vector.random2D();
 
@@ -56,7 +57,7 @@ function Asteroid(world, params) {
         });
       }
 
-      levelmanager.recordKill(this);
+      levelmanager.recordKill(this, entity.owner);
     }
   }
 

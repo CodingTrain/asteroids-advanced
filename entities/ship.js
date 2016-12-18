@@ -4,7 +4,7 @@
 // Code for: https://youtu.be/hacZU523FyM
 
 function Ship(world, params) {
-  Entity.call(this, params.pos, params.r);
+  Entity.call(this, params);
   this.lives = params.lives !== undefined ? params.lives : 3;
   var shieldDuration = params.shieldDuration !== undefined ? params.shieldDuration : 180;
   this.shields = shieldDuration;
@@ -64,8 +64,8 @@ function Ship(world, params) {
     if (entity.toString(entity) === "[object Asteroid]") {
       this.lives--;
       // TODO: Do something with this variable.
-      if (this.lives === 0) {
-        world.gameover = true;
+      if (this.lives === 0 && this.owner !== -1) {
+        world.getPlayer(this.owner).dead = true;
       }
 
       this.canCollide = false;
@@ -89,7 +89,7 @@ function Ship(world, params) {
         lastShot--;
       } else if (keys.space || keys.spacerepeat) {
         world.addEndFrameTask(function (world) { world.createEntity(Laser,
-          { pos: p5.Vector.fromAngle(scope.heading).mult(scope.r).add(scope.pos), heading: scope.heading }); });
+          { pos: p5.Vector.fromAngle(scope.heading).mult(scope.r).add(scope.pos), heading: scope.heading, owner: scope.owner }); });
         keys.space = false;
         lastShot = rateOfFire;
       }

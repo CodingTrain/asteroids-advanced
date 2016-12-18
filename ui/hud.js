@@ -1,7 +1,9 @@
-function Hud(world, levelmanager, ship) {
+function Hud() {
+  UIElement.call(this, { pos: createVector(0, 0) });
   var size = 20;
   var padding = 10;
   var lifeWidth = 20;
+  var player;
 
   /*
   --0--
@@ -25,8 +27,9 @@ function Hud(world, levelmanager, ship) {
 
   ];
 
-  this.render = function() {
-    var scoreString = "" + levelmanager.getScore();
+  this.render = function(world) {
+    player = world.getLocalPlayer();
+    var scoreString = "" + player.score;
     var digitPos = createVector((width / 2 - (scoreString.length * (size + padding) - padding) / 2), padding);
     for(var i = 0; i < scoreString.length; i++) {
       var dmap = digitMaps[scoreString.charAt(i)];
@@ -34,7 +37,7 @@ function Hud(world, levelmanager, ship) {
       digitPos.x += size + padding;
     }
     drawLives();
-    if(world.gameover) {
+    if(player.dead) {
       push();
       textSize(32);
       fill(255);
@@ -43,11 +46,12 @@ function Hud(world, levelmanager, ship) {
   }
 
   function drawLives() {
+    var lives = player.getEntity().lives;
     push();
     stroke(255);
     fill(0);
-    var top = createVector((width / 2) + (lifeWidth + padding) * (ship.lives - 1) / 2, padding * 2 + size * 2);
-    for(var i = 0; i < ship.lives; i++) {
+    var top = createVector((width / 2) + (lifeWidth + padding) * (lives - 1) / 2, padding * 2 + size * 2);
+    for(var i = 0; i < lives; i++) {
       triangle(top.x, top.y, top.x - lifeWidth / 2, top.y + 25, top.x + lifeWidth / 2, top.y + 25);
       top.x -= lifeWidth + padding;
     }
@@ -96,3 +100,5 @@ function Hud(world, levelmanager, ship) {
     }
   }
 }
+
+Hud.prototype = Object.create(UIElement.prototype);

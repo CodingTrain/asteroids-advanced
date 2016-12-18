@@ -25,7 +25,8 @@ var colors = [
 ]
 
 function Laser(world, params) {
-  Entity.call(this, params.pos, 4);
+  params.r = params.r !== undefined ? params.r : 4;
+  Entity.call(this, params);
 
   this.vel = p5.Vector.fromAngle(params.heading);
   this.vel.mult(10);
