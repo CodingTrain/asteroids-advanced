@@ -31,16 +31,19 @@ function Laser(world, params) {
   this.vel = p5.Vector.fromAngle(params.heading);
   this.vel.mult(10);
   this.color = colors[floor(random(0, colors.length - 1))];
+  this.life = params.life !== undefined ? params.life : 100;
+  var maxlife = this.life;
 
   playSoundEffect(laserSoundEffect[floor(random(3))]);
 
   this.update = function() {
-    return Entity.prototype.update.call(this);
+    this.life--;
+    return Entity.prototype.update.call(this) || this.life < 0;
   }
 
   this.render = function() {
     push();
-    stroke(this.color[0], this.color[1], this.color[2]);
+    stroke(this.color[0], this.color[1], this.color[2], 55 + 200 * this.life / maxlife);
     strokeWeight(this.r);
     point(this.pos.x, this.pos.y);
     pop();
