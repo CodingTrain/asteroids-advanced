@@ -16,18 +16,23 @@ function Asteroid(pos, r, size) {
 
   //smaller asteroids go a bit faster
   this.size = size;
-  switch(size) {
+  switch (size) {
     case 1:
-      this.vel.mult(1.5); break;
+      this.vel.mult(1.5);
+      break;
     case 0:
-      this.vel.mult(2); break;
+      this.vel.mult(2);
+      break;
   }
 
 
-  this.offset = [];
+  this.vertices_ = [];
   for (var i = 0; i < this.total; i++) {
-    this.offset[i] = random(-this.r * 0.2, this.r * 0.5);
+    var angle = this.heading + map(i, 0, this.total, 0, TWO_PI);
+    r = this.r + random(-this.r * 0.2, this.r * 0.5);
+    this.vertices_.push(createVector(r * cos(angle), r * sin(angle)));
   }
+
 
   Entity.prototype.setRotation.call(this, random(-0.03, 0.03));
 
@@ -38,36 +43,32 @@ function Asteroid(pos, r, size) {
     translate(this.pos.x, this.pos.y);
     rotate(this.heading);
     beginShape();
-    for (var i = 0; i < this.total; i++) {
-      var angle = map(i, 0, this.total, 0, TWO_PI);
-      var r = this.r + this.offset[i];
-      vertex(r * cos(angle), r * sin(angle));
+    for (var i = 0; i < this.vertices_.length; i++) {
+      vertex(this.vertices_[i].x, this.vertices_[i].y);
     }
     endShape(CLOSE);
     pop();
   }
 
-  this.playSoundEffect = function(soundArray){
-    soundArray[floor(random(0,soundArray.length))].play();
+  this.playSoundEffect = function(soundArray) {
+    soundArray[floor(random(0, soundArray.length))].play();
   }
 
   this.breakup = function() {
-    if(size > 0)
-      return [new Asteroid(this.pos, this.r, this.size-1), new Asteroid(this.pos, this.r, this.size-1)];
+    if (size > 0)
+      return [new Asteroid(this.pos, this.r, this.size - 1), new Asteroid(this.pos, this.r, this.size - 1)];
     else
       return [];
   }
 
   this.vertices = function() {
-    var vertices = []
-    for(var i = 0; i < this.total; i++) {
-      var angle = this.heading + map(i, 0, this.total, 0, TWO_PI);
-      var r = this.r + this.offset[i];
-      vertices.push(p5.Vector.add(createVector(r * cos(angle), r * sin(angle)), this.pos));
+    var vertices = [];
+    for (var i = 0; i < this.vertices_.length; i++) {
+      vertices.push(this.vertices_[i].copy().rotate(this.heading).add(this.pos));
     }
-
     return vertices;
   }
+
 }
 
 Asteroid.prototype = Object.create(Entity.prototype);
