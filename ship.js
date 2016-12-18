@@ -3,6 +3,11 @@
 // http://patreon.com/codingrainbow
 // Code for: https://youtu.be/hacZU523FyM
 
+var fireColors = [];
+for (var i = 0; i*10 <= 255; i++) {
+  fireColors[i] = "rgb(255," + i*10 + ",0)";
+}
+
 function Ship(pos, r) {
   Entity.call(this, width / 2, height / 2, 20);
   this.isDestroyed = false;
@@ -96,6 +101,7 @@ function Ship(pos, r) {
       if(this.accelMagnitude != 0) {
         translate(-this.r, 0);
         rotate(random(PI / 4, 3 * PI / 4));
+        stroke(fireColors[floor(random(fireColors.length))]);
         line(0, 0, 0, 10);
       }
 
