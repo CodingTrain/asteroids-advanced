@@ -3,16 +3,35 @@
 // http://patreon.com/codingrainbow
 // Code for: https://youtu.be/hacZU523FyM
 
-var colors = [[248, 12, 18], [238, 17, 0], [255, 51, 17], [255, 68, 34], [255, 102, 68], [255, 153, 51], [254, 174, 45], [204, 187, 51], [208, 195, 16], [170, 204, 34], [105, 208, 37], [34, 204, 170], [18, 189, 185], [17, 170, 187], [68, 68, 221], [51, 17, 187], [59, 12, 189], [68, 34, 153]]
+var colors = [
+  [248, 12, 18],
+  [238, 17, 0],
+  [255, 51, 17],
+  [255, 68, 34],
+  [255, 102, 68],
+  [255, 153, 51],
+  [254, 174, 45],
+  [204, 187, 51],
+  [208, 195, 16],
+  [170, 204, 34],
+  [105, 208, 37],
+  [34, 204, 170],
+  [18, 189, 185],
+  [17, 170, 187],
+  [68, 68, 221],
+  [51, 17, 187],
+  [59, 12, 189],
+  [68, 34, 153]
+]
 
 function Laser(world, params) {
   Entity.call(this, params.pos, 4);
 
   this.vel = p5.Vector.fromAngle(params.heading);
   this.vel.mult(10);
-  this.color = colors[floor(random(0,colors.length-1))];
+  this.color = colors[floor(random(0, colors.length - 1))];
 
-  playSoundEffect(laserSoundEffect);
+  playSoundEffect(laserSoundEffect[floor(random(3))]);
 
   this.update = function() {
     if (Entity.prototype.update.call(this) || this.offscreen()) {
@@ -28,6 +47,7 @@ function Laser(world, params) {
     pop();
   }
 
+
   this.collides = function(entity) {
     if (entity.toString() !== "[object Asteroid]" ||
         !Entity.prototype.collides.call(this, entity)){
@@ -35,11 +55,9 @@ function Laser(world, params) {
     }
 
     var last_pos = p5.Vector.sub(this.pos, this.vel);
-    var last_angle = p5.Vector.sub(last_pos, entity.pos).heading();
-    var new_angle = p5.Vector.sub(this.pos, entity.pos).heading();
-    var asteroid_vertices = entity.vertices(last_angle, new_angle);
+    var asteroid_vertices = entity.globalVertices();
     for(var i = 0; i < asteroid_vertices.length - 1; i++) {
-      if(lineIntersect(last_pos, this.pos, asteroid_vertices[i], asteroid_vertices[i + 1])) {
+      if(lineIntersect(last_pos, this.pos, asteroid_vertices[i], asteroid_vertices[(i + 1) % asteroid_vertices.length])) {
         return true;
       }
     }

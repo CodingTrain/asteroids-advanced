@@ -3,7 +3,8 @@
 // http://patreon.com/codingrainbow
 // Code for: https://youtu.be/hacZU523FyM
 
-var laserSoundEffect;
+
+var laserSoundEffect = [];
 var explosionSoundEffects = [];
 var world;
 
@@ -14,7 +15,9 @@ function playSoundEffect(sound){
 }
 
 function preload() {
-  laserSoundEffect = loadSound('audio/pew.mp3');
+  for (var i =0; i < 3; i++){
+    laserSoundEffect[i] = loadSound('audio/pew-'+i+'.mp3');
+  }
   for (var i =0; i < 3; i++){
     explosionSoundEffects[i] = loadSound('audio/explosion-'+i+'.mp3');
   }

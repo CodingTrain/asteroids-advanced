@@ -10,12 +10,21 @@ function Asteroid(world, params) {
   this.size = params.size !== undefined ? params.size : 1;
   this.vel = p5.Vector.random2D();
   this.total = floor(random(7, 15));
-  this.offset = [];
+
+  var max_r = -1;
+  this.vertices = [];
+  for (var i = 0; i < this.total; i++) {
+    var angle = map(i, 0, this.total, 0, TWO_PI);
+    r = this.r + random(-this.r * 0.2, this.r * 0.5);
+    this.vertices.push(createVector(r * cos(angle), r * sin(angle)));
+    if(r > max_r) {
+      max_r = r;
+    }
+  }
   levelmanager.recordAsteroidCreation();
   Entity.prototype.setRotation.call(this, random(-0.03, 0.03));
-  for (var i = 0; i < this.total; i++) {
-    this.offset[i] = random(-this.r * 0.75, 0);
-  }
+  this.r = max_r;
+
 
   // Smaller asteroids go a bit faster.
   switch(this.size) {
@@ -32,24 +41,19 @@ function Asteroid(world, params) {
     translate(this.pos.x, this.pos.y);
     rotate(this.heading);
     beginShape();
-    for (var i = 0; i < this.total; i++) {
-      var angle = map(i, 0, this.total, 0, TWO_PI);
-      var r = this.r + this.offset[i];
-      vertex(r * cos(angle), r * sin(angle));
+    for (var i = 0; i < this.vertices.length; i++) {
+      vertex(this.vertices[i].x, this.vertices[i].y);
     }
     endShape(CLOSE);
     pop();
   }
 
-  this.vertices = function() {
-    var vertices = []
-    for(var i = 0; i < this.total; i++) {
-      var angle = this.heading + map(i, 0, this.total, 0, TWO_PI);
-      var r = this.r + this.offset[i];
-      vertices.push(p5.Vector.add(createVector(r * cos(angle), r * sin(angle)), this.pos));
+  this.globalVertices = function() {
+    var glob_vertices = [];
+    for (var i = 0; i < this.vertices.length; i++) {
+      glob_vertices.push(this.vertices[i].copy().rotate(this.heading).add(this.pos));
     }
-
-    return vertices;
+    return glob_vertices;
   }
 
   // Asteroid only cares about lasers and they do the check.
