@@ -3,6 +3,8 @@ function World(width, height, viewSize) {
   this.height = height;
   this.halfwidth = width / 2;
   this.halfheight = height / 2;
+  this.seed = millis();
+  this.time = 0;
 
 
   var hud;
@@ -70,6 +72,25 @@ function World(width, height, viewSize) {
   this.render = function() {
     push();
     background(0);
+    randomSeed(this.seed);
+    push();
+    for (var i = 0; i < 500; i++) {
+      stroke(255 * sin(random(0, TWO_PI) + this.time / 50));
+      var star = createVector(
+        random(-this.halfwidth, this.halfwidth),
+        random(-this.halfheight, this.halfheight)
+      );
+      var playerPos = this.getLocalPlayer().getEntity().pos;
+      var relPos = p5.Vector.sub(star, playerPos);
+      if (relPos.x > windowWidth / 2) star.x -= this.width;
+      else if (relPos.x < -windowWidth / 2) star.x += this.width;
+      if (relPos.y > windowHeight / 2) star.y -= this.height;
+      else if (relPos.y < -windowHeight / 2) star.y += this.height;
+      point(star.x, star.y);
+    }
+    pop();
+    this.time ++;
+    randomSeed(millis());
     entitymanager.render();
     pop();
   }
