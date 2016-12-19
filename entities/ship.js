@@ -4,15 +4,12 @@
 // Code for: https://youtu.be/hacZU523FyM
 
 function Ship(world, params) {
-  Entity.call(this, params.pos, params.r);
+  Entity.call(this, params);
   this.lives = params.lives !== undefined ? params.lives : 3;
   var shieldDuration = params.shieldDuration !== undefined ? params.shieldDuration : 180;
   this.shields = shieldDuration;
-  this.brokenParts = [];
   var resetPos = this.pos.copy();
-  var destroyFramesReset = 200;
   var respawnFramesReset = 300;
-  var destroyFrames;
   var respawnFrames;
   this.shape = new Shape([
     createVector(-2/3 * this.r, -this.r),
@@ -20,25 +17,31 @@ function Ship(world, params) {
     createVector(4/3 * this.r, 0)
   ]);
 
+  var fireColors = [];
+  for (var i = 0; i*10 <= 255; i++) {
+    fireColors[i] = "rgb(255," + i*10 + ",0)";
+  }
+
   var rateOfFire = 20;
   var lastShot = 0;
   var scope = this;
 
-  var keys = {
-    up: false,
-    left: false,
-    right: false,
-    space: false,
-    spacerepeat: false
+  var inputs = {
+    thrust: false,
+    rotateleft: false,
+    rotateright: false,
+    laser: false
   };
+
+  this.setInputs = function(thrust, rotateleft, rotateright, laser) {
+    inputs.thrust = thrust;
+    inputs.rotateleft = rotateleft;
+    inputs.rotateright = rotateright;
+    inputs.laser = laser;
+  }
 
   this.registerId = function(id) {
     Entity.prototype.registerId.call(this, id);
-    var scope = this;
-    world.registerListener(this, " ".charCodeAt(0), function(char, code, press) { keys.spacerepeat = press; if (press) { keys.space = true; }});
-    world.registerListener(this, RIGHT_ARROW, function(char, code, press) { keys.right = press; });
-    world.registerListener(this, LEFT_ARROW, function(char, code, press) { keys.left = press; });
-    world.registerListener(this, UP_ARROW, function(char, code, press) { keys.up = press; });
   }
 
   this.collides = function(entity) {
@@ -64,8 +67,8 @@ function Ship(world, params) {
     if (entity.toString(entity) === "[object Asteroid]") {
       this.lives--;
       // TODO: Do something with this variable.
-      if (this.lives === 0) {
-        world.gameover = true;
+      if (this.lives === 0 && this.owner !== -1) {
+        world.getPlayer(this.owner).dead = true;
       }
 
       this.canCollide = false;
@@ -81,24 +84,18 @@ function Ship(world, params) {
   this.update = function() {
 
     if(this.canCollide) {
-
-      this.setRotation((keys.left ? -0.08 : 0) + (keys.right ? 0.08 : 0));
-      this.setAccel(keys.up ? 0.1 : 0);
+      this.setRotation((inputs.rotateleft ? -0.08 : 0) + (inputs.rotateright ? 0.08 : 0));
+      this.setAccel(inputs.thrust ? 0.1 : 0);
 
       if (lastShot > 0) {
         lastShot--;
-      } else if (keys.space || keys.spacerepeat) {
+      } else if (inputs.laser) {
         world.addEndFrameTask(function (world) { world.createEntity(Laser,
-          { pos: p5.Vector.fromAngle(scope.heading).mult(scope.r).add(scope.pos), heading: scope.heading }); });
-        keys.space = false;
+          { pos: p5.Vector.fromAngle(scope.heading).mult(scope.r).add(scope.pos), heading: scope.heading, owner: scope.owner }); });
         lastShot = rateOfFire;
       }
 
       if (Entity.prototype.update.call(this)) {
-        input.deregisterListener(this.id, " ".charCodeAt(0));
-        input.deregisterListener(this.id, RIGHT_ARROW);
-        input.deregisterListener(this.id, LEFT_ARROW);
-        input.deregisterListener(this.id, UP_ARROW);
         return true;
       }
 
@@ -132,6 +129,7 @@ function Ship(world, params) {
       if(this.accelMagnitude !== 0) {
         translate(-this.r, 0);
         rotate(random(PI / 4, 3 * PI / 4));
+        stroke(fireColors[floor(random(fireColors.length))]);
         line(0, 0, 0, 10);
       }
       pop();

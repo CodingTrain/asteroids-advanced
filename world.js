@@ -1,13 +1,28 @@
-function World(width, height) {
+function World(width, height, viewSize) {
   this.width = width;
   this.height = height;
+  this.halfwidth = width / 2;
+  this.halfheight = height / 2;
+  this.seed = millis();
+  this.time = 0;
+
 
   var hud;
   var levelmanager;
   var entitymanager = new EntityManager();
   var endFrameTasks = [];
+  var players = [];
 
-  this.gameover = false;
+  // Returns the player playing on this machine.
+  // TODO: Currently returns the first player as we only have one.
+  this.getLocalPlayer = function() {
+    return players[0];
+  }
+
+  // Returns the player with the specific id.
+  this.getPlayer = function(id) {
+    return players[id];
+  }
 
   // Adds a function to a stack, will be called at the end of the frame once
   // all the other logic is completed.
@@ -35,17 +50,17 @@ function World(width, height) {
 
   // Initializes the world.
   this.initialize = function() {
-    var ship = new Ship(this, { pos: createVector(width / 2, height / 2), r: 20, shieldDuration: 180 });
-    entitymanager.add(ship);
-    levelmanager = new LevelManager(this, ship, 0);
-    hud = new Hud(this, levelmanager, ship);
+    players[0] = new Player(players.length, "SomeRandomName", this);
+    entitymanager.add(players[0].getEntity());
+    levelmanager = new LevelManager(this, players[0].getEntity(), 0);
+    hud = new Hud(this, levelmanager, players[0].getEntity());
   }
 
   // Does all the update logic for this frame.
   this.update = function() {
     entitymanager.update();
     entitymanager.checkCollisions();
-    levelmanager.update();
+    levelmanager.update(players);
     for (var i = 0; i < endFrameTasks.length; i++) {
       endFrameTasks[i](this);
     }
@@ -55,8 +70,28 @@ function World(width, height) {
 
   // Does all the rendering for this frame.
   this.render = function() {
+    push();
     background(0);
+    randomSeed(this.seed);
+    push();
+    for (var i = 0; i < 500; i++) {
+      stroke(255 * pow(sin(random(0, PI) + this.time / 80), 2));
+      var star = createVector(
+        random(-this.halfwidth, this.halfwidth),
+        random(-this.halfheight, this.halfheight)
+      );
+      var playerPos = this.getLocalPlayer().getEntity().pos;
+      var relPos = p5.Vector.sub(star, playerPos);
+      if (relPos.x > windowWidth / 2) star.x -= this.width;
+      else if (relPos.x < -windowWidth / 2) star.x += this.width;
+      if (relPos.y > windowHeight / 2) star.y -= this.height;
+      else if (relPos.y < -windowHeight / 2) star.y += this.height;
+      point(star.x, star.y);
+    }
+    pop();
+    this.time ++;
+    randomSeed(millis());
     entitymanager.render();
-    hud.render();
+    pop();
   }
 }
