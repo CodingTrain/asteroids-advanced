@@ -41,8 +41,6 @@ function Asteroid(world, params) {
     pop();
   }
 
-  this.collides = function() {}
-
   this.collision = function(entity) {
     if (!this.dead && entity.toString() === "[object Laser]") {
       this.shape.breakAnime();
