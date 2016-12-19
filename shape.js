@@ -31,6 +31,26 @@ function Shape(vertices) {
     }
     return glob_vertices;
   }
+  
+  //calculates the area within a shape
+  this.area = function() {
+    var area = 0;
+    for ( var i = 0; i < this.vertices.length - 1; i++) {
+      area += this.vertices[i].x * this.vertices[i+1].y - this.vertices[i].y * this.vertices[i+1].x;
+    }
+    return abs(area / 2);
+  }
+  
+  //checks if the shape contains a specific point
+  this.contains = function(pos) {
+    var c = false;
+    for (var i = 0, j = this.vertices.length-1; i < this.vertices.length; j = i++) {
+      if ( ((this.vertices[i].y>pos.y) != (this.vertices[j].y>pos.y)) &&
+       (pos.x < (this.vertices[j].x-this.vertices[i].x) * (pos.y-this.vertices[i].y) / (this.vertices[j].y-this.vertices[i].y) + this.vertices[i].x) )
+         c = !c;
+    }
+    return c;
+  }
 
   this.draw = function() {
 
@@ -83,5 +103,15 @@ function Shape(vertices) {
     return true;
 
   }
-
+  
+}
+  
+Shape.smooth = function(vertices, loop_) {
+  if(loop_ === undefined) {
+    loop_ = true;
+  }
+  for (var i = 0; i < vertices.length - (loop_ ? 0 : 1); i+=2) {
+    var v_ = createVector((vertices[i].x + vertices[(i+1)%vertices.length].x) * 0.5 + random(10), (vertices[i].y + vertices[(i+1)%vertices.length].y) * 0.5 + random(10));
+    vertices.splice(i + 1, 0, v_);
+  }
 }

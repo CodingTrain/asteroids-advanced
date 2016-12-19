@@ -1,14 +1,14 @@
 function LevelManager(world, level) {
   var asteroids = 0;
   var level = 0;
+  var score = 0;
   var scope = this;
-  var points = [100, 50, 20]; // small, med, large points
-
+  
   this.recordKill = function(asteroid, killerId) {
     asteroids--;
     console.log(killerId);
     if (killerId !== -1) {
-      world.getPlayer(killerId).score += points[asteroid.size];
+      world.getPlayer(killerId).score += floor(asteroid.shape.area() / 100);
     }
   }
 
