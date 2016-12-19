@@ -11,21 +11,16 @@ function Asteroid(world, params) {
   this.vel = params.vel !== undefined ? params.vel : p5.Vector.random2D();
   this.total = floor(random(7, 15));
   this.heading = params.heading !== undefined ? params.heading : 0;
-
+  
+  var vertices = [];
   if (params.vertices === undefined) {
-    var max_r = -1;
-    vertices = [];
+    var range = this.r * 0.5;
     for (var i = 0; i < this.total; i++) {
       var angle = map(i, 0, this.total, 0, TWO_PI);
-      var r = this.r + random(-this.r * 0.2, this.r * 0.5);
+      r = this.r - random(0, range);
       vertices.push(createVector(r * cos(angle), r * sin(angle)));
-      if(r > max_r) {
-        max_r = r;
-      }
     }
-    this.r = max_r;
-  }
-  else {
+  } else {
     vertices = params.vertices;
   }
   this.shape = new Shape(vertices);
