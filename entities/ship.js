@@ -8,17 +8,19 @@ function Ship(world, params) {
   this.lives = params.lives !== undefined ? params.lives : 3;
   var shieldDuration = params.shieldDuration !== undefined ? params.shieldDuration : 180;
   this.shields = shieldDuration;
-  this.brokenParts = [];
   var resetPos = this.pos.copy();
-  var destroyFramesReset = 200;
   var respawnFramesReset = 300;
-  var destroyFrames;
   var respawnFrames;
   this.shape = new Shape([
     createVector(-2/3 * this.r, -this.r),
     createVector(-2/3 * this.r, this.r),
     createVector(4/3 * this.r, 0)
   ]);
+
+  var fireColors = [];
+  for (var i = 0; i*10 <= 255; i++) {
+    fireColors[i] = "rgb(255," + i*10 + ",0)";
+  }
 
   var rateOfFire = 20;
   var lastShot = 0;
@@ -127,6 +129,7 @@ function Ship(world, params) {
       if(this.accelMagnitude !== 0) {
         translate(-this.r, 0);
         rotate(random(PI / 4, 3 * PI / 4));
+        stroke(fireColors[floor(random(fireColors.length))]);
         line(0, 0, 0, 10);
       }
       pop();
