@@ -70,14 +70,6 @@ function World(width, height, viewSize) {
   this.render = function() {
     push();
     background(0);
-    push();
-    stroke(255, 255, 255);
-    strokeWeight(10);
-    line(-world.halfwidth , -world.halfheight, world.halfwidth, -world.halfheight);
-    line(-world.halfwidth, world.halfheight, world.halfwidth, world.halfheight);
-    line(-world.halfwidth, -world.halfheight, -world.halfwidth, world.halfheight);
-    line(world.halfwidth, -world.halfheight, world.halfwidth, world.halfheight);
-    pop();
     entitymanager.render();
     pop();
   }
