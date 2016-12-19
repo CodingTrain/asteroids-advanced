@@ -75,7 +75,7 @@ function World(width, height, viewSize) {
     randomSeed(this.seed);
     push();
     for (var i = 0; i < 500; i++) {
-      stroke(255 * sin(random(0, TWO_PI) + this.time / 50));
+      stroke(255 * pow(sin(random(0, PI) + this.time / 80), 2));
       var star = createVector(
         random(-this.halfwidth, this.halfwidth),
         random(-this.halfheight, this.halfheight)
