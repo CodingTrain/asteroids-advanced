@@ -28,7 +28,7 @@ function Laser(world, params) {
   params.r = params.r !== undefined ? params.r : 4;
   Entity.call(this, params);
 
-  this.vel = p5.Vector.fromAngle(params.heading).mult(20);
+  this.vel = p5.Vector.fromAngle(params.heading).mult(40);
   this.vel.add(params.initialVel);
   this.color = colors[floor(random(0, colors.length - 1))];
   this.life = params.life !== undefined ? params.life : 100;

@@ -17,7 +17,7 @@ function LevelManager(world, level) {
   }
 
   this.update = function (players) {
-    if (false && asteroids === 0) {
+    if (asteroids === 0) {
       level++;
       for (var i = 0; i < players.length; i++) {
         if (players[i].dead) {
