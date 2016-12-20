@@ -89,7 +89,7 @@ function World(width, height, viewSize) {
       point(star.x, star.y);
     }
     pop();
-    this.time ++;
+    this.time++;
     randomSeed(millis());
     entitymanager.render();
     pop();
