@@ -138,7 +138,7 @@ function Ship(world, params) {
       var shieldCol = random(map(this.shields, 0, shieldDuration, 255, 0), 255);
       stroke(shieldCol, shieldCol, 255);
       this.shape.draw();
-      if (this.accelMagnitude !== 0) {
+      if (inputs.thrust) {
         translate(-this.r, 0);
         rotate(random(PI / 4, 3 * PI / 4));
         stroke(fireColors[floor(random(fireColors.length))]);
