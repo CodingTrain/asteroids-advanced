@@ -28,20 +28,20 @@ function Laser(world, params) {
   params.r = params.r !== undefined ? params.r : 4;
   Entity.call(this, params);
 
-  this.vel = p5.Vector.fromAngle(params.heading);
-  this.vel.mult(20);
+  this.vel = p5.Vector.fromAngle(params.heading).mult(20);
+  this.vel.add(params.initialVel);
   this.color = colors[floor(random(0, colors.length - 1))];
   this.life = params.life !== undefined ? params.life : 100;
   var maxlife = this.life;
 
   playSoundEffect(laserSoundEffect[floor(random(3))]);
 
-  this.update = function() {
+  this.update = function () {
     this.life--;
     return Entity.prototype.update.call(this) || this.life < 0;
   }
 
-  this.render = function() {
+  this.render = function () {
     push();
     stroke(this.color[0], this.color[1], this.color[2], 55 + 200 * this.life / maxlife);
     strokeWeight(this.r);
@@ -50,7 +50,7 @@ function Laser(world, params) {
   }
 
 
-  this.collides = function(entity) {
+  this.collides = function (entity) {
     if (entity.toString() !== "[object Asteroid]" ||
       !Entity.prototype.collides.call(this, entity)) {
       return false;
@@ -66,13 +66,13 @@ function Laser(world, params) {
     return false;
   }
 
-  this.collision = function(entity) {
+  this.collision = function (entity) {
     if (entity.toString() === "[object Asteroid]") {
       this.dead = true;
     }
   }
 
-  this.toString = function() {
+  this.toString = function () {
     return "[object Laser]";
   }
 }

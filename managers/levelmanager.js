@@ -4,7 +4,7 @@ function LevelManager(world, level) {
   var score = 0;
   var scope = this;
 
-  this.recordKill = function(asteroid, killerId) {
+  this.recordKill = function (asteroid, killerId) {
     asteroids--;
     console.log(killerId);
     if (killerId !== -1) {
@@ -12,12 +12,12 @@ function LevelManager(world, level) {
     }
   }
 
-  this.recordAsteroidCreation = function() {
+  this.recordAsteroidCreation = function () {
     asteroids++;
   }
 
-  this.update = function(players) {
-    if (asteroids === 0) {
+  this.update = function (players) {
+    if (false && asteroids === 0) {
       level++;
       for (var i = 0; i < players.length; i++) {
         if (players[i].dead) {
@@ -28,7 +28,7 @@ function LevelManager(world, level) {
       }
 
       for (var i = 0; i < level + 5; i++) {
-        world.addEndFrameTask(function(world) {
+        world.addEndFrameTask(function (world) {
           world.createEntity(Asteroid, {
             levelmanager: scope
           });

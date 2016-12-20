@@ -13,7 +13,9 @@ function Entity(params) {
   this.velMu = 0;
   this.rotMu = 0;
   this.velDrag = 0;
+  this.velDragEnabled = true;
   this.rotDrag = 0;
+  this.rotDragEnabled = true;
   this.owner = params.owner !== undefined ? params.owner : -1;
 }
 
@@ -102,10 +104,10 @@ Entity.prototype.update = function() {
         this.vel.mult(0);
       }
     } else if (this.force.magSq() > F * F) {
-        var frict = this.force.copy();
-        frict.normalize();
-        frict.mult(-F);
-        this.applyForce(frict);
+      var frict = this.force.copy();
+      frict.normalize();
+      frict.mult(-F);
+      this.applyForce(frict);
     } else this.force.mult(0);
   }
 
@@ -127,13 +129,13 @@ Entity.prototype.update = function() {
 
   }
 
-  if (this.velDrag > 0) {
+  if (this.velDragEnabled && this.velDrag != 0) {
     var drag = this.vel.copy();
     drag.mult(-this.velDrag * this.vel.mag());
     this.applyForce(drag);
   }
 
-  if (this.rotDrag > 0) {
+  if (this.rotDragEnabled && this.rotDrag > 0) {
     var drag = this.rotDrag * this.rotation * this.rotation;
     drag = this.rotation > 0 ? -drag : drag;
     this.applyTorque(drag);
