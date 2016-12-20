@@ -7,8 +7,11 @@ function Asteroid(world, params) {
   var levelmanager = params.levelmanager;
   params.pos = params.pos !== undefined ? params.pos : createVector(random(-world.halfwidth, world.halfwidth), random(-world.halfheight, world.halfheight));
   params.r = params.r !== undefined ? params.r : random(60, 80);
+  params.mass = params.mass !== undefined ? params.mass : PI * params.r * params.r;
   Entity.call(this, params);
-  this.vel = params.vel !== undefined ? params.vel : p5.Vector.random2D();
+  this.vel = params.vel !== undefined ? params.vel : createVector(0, 0);
+  Entity.prototype.applyForce.call(this, params.force !== undefined ? params.force : p5.Vector.random2D().mult(5000));
+  Entity.prototype.applyTorque.call(this, random(-0.03, 0.03));
   this.total = floor(random(7, 15));
   this.heading = params.heading !== undefined ? params.heading : 0;
 
@@ -25,8 +28,6 @@ function Asteroid(world, params) {
   }
   this.shape = new Shape(vertices);
   levelmanager.recordAsteroidCreation();
-  Entity.prototype.setRotation.call(this, random(-0.03, 0.03));
-
 
   if (this.shape.area() > 500) {
     var error = abs((PI - this.shape.area() / (this.r * this.r)) / PI);
@@ -206,7 +207,8 @@ Asteroid.prototype.splitAt = function(impactPos, levelmanager) {
       pos: p5.Vector.add(scope.pos, pos1_offset),
       r: rad1,
       vertices: asteroid1_vertices,
-      vel: pos1_offset.normalize(),
+      vel: scope.vel.copy(),
+      force: pos1_offset.normalize().mult(2000),
       heading: scope.heading,
       levelmanager: levelmanager
     });
@@ -214,7 +216,8 @@ Asteroid.prototype.splitAt = function(impactPos, levelmanager) {
       pos: p5.Vector.add(scope.pos, pos2_offset),
       r: rad2,
       vertices: asteroid2_vertices,
-      vel: pos2_offset.normalize(),
+      vel: scope.vel.copy(),
+      force: pos2_offset.normalize().mult(2000),
       heading: scope.heading,
       levelmanager: levelmanager
     });
