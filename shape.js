@@ -31,7 +31,7 @@ function Shape(vertices) {
     }
     return glob_vertices;
   }
-  
+
   //calculates the area within a shape
   this.area = function() {
     var area = 0;
@@ -40,7 +40,7 @@ function Shape(vertices) {
     }
     return abs(area / 2);
   }
-  
+
   //checks if the shape contains a specific point
   this.contains = function(pos) {
     var c = false;
@@ -105,7 +105,7 @@ function Shape(vertices) {
   }
   
 }
-  
+
 Shape.smooth = function(vertices, loop_) {
   if(loop_ === undefined) {
     loop_ = true;
