@@ -11,6 +11,11 @@ function Ship(world, params) {
   var resetPos = this.pos.copy();
   var respawnFramesReset = 300;
   var respawnFrames;
+  this.mass = 1000;
+  this.rotForce = 10;
+  this.thrustForce = 200;
+  this.rotDrag = Entity.calculateDragCo(this.rotForce, 0.07);
+  this.velDrag = Entity.calculateDragCo(this.thrustForce, 20);
   this.shape = new Shape([
     createVector(-2 / 3 * this.r, -this.r),
     createVector(-2 / 3 * this.r, this.r),
@@ -84,8 +89,10 @@ function Ship(world, params) {
   this.update = function() {
 
     if (this.canCollide) {
-      this.setRotation((inputs.rotateleft ? -0.08 : 0) + (inputs.rotateright ? 0.08 : 0));
-      this.setAccel(inputs.thrust ? 0.1 : 0);
+      this.applyTorque((inputs.rotateleft ? -this.rotForce : 0) + (inputs.rotateright ? this.rotForce : 0));
+      var thrust = p5.Vector.fromAngle(this.heading);
+      thrust.mult(inputs.thrust ? this.thrustForce : 0)
+      this.applyForce(thrust);
 
       if (lastShot > 0) {
         lastShot--;
