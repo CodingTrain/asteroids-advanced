@@ -51,9 +51,12 @@ function setup() {
 }
 
 function draw() {
+  push();
+  background(0);
   world.update();
   uimanager.update();
 
   world.render();
   uimanager.render();
+  pop();
 }

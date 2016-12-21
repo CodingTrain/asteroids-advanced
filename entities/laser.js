@@ -28,23 +28,23 @@ function Laser(world, params) {
   params.r = params.r !== undefined ? params.r : 4;
   Entity.call(this, params);
 
-  this.vel = p5.Vector.fromAngle(params.heading);
-  this.vel.mult(20);
+  this.vel = p5.Vector.fromAngle(params.heading).mult(40);
+  this.vel.add(params.initialVel);
   this.color = colors[floor(random(0, colors.length - 1))];
-  this.life = params.life !== undefined ? params.life : 50;
-  var maxlife = this.life;
+  this.duration = params.duration !== undefined ? params.duration : 20;
+  var maxDuration = this.duration;
 
   playSoundEffect(laserSoundEffect[floor(random(3))]);
 
   this.update = function() {
-    this.life--;
-    return Entity.prototype.update.call(this) || this.life < 0;
+    this.duration--;
+    return Entity.prototype.update.call(this) || this.duration < 0;
   }
 
   this.render = function() {
     push();
     translate(this.pos.x, this.pos.y);
-    stroke(this.color[0], this.color[1], this.color[2], 55 + 200 * this.life / maxlife);
+    stroke(this.color[0], this.color[1], this.color[2], 55 + 200 * this.duration / maxDuration);
     strokeWeight(this.r);
     var halfLine = this.vel.copy();
     halfLine.mult(0.5);

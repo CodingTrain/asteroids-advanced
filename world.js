@@ -30,14 +30,24 @@ function World(width, height, viewSize) {
     endFrameTasks.push(callback);
   }
 
-  // Adds a callback for the specified entity when the specified code is hit.
-  this.registerListener = function(entity, code, callback) {
-    input.registerListener(entity.id, code, callback);
+  // Adds a callback for the specified entity when the specified keycode is hit.
+  this.registerKeyListener = function(entity, code, callback) {
+    input.registerKeyListener(entity.id, code, callback);
   }
 
-  // Removes all callbacks for the specified entity and code.
-  this.degisterListener = function(entity, code) {
-    input.degisterListener(entity.id, code);
+  // Removes all callbacks for the specified entity and keycode.
+  this.degisterKeyListener = function(entity, code) {
+    input.degisterKeyListener(entity.id, code);
+  }
+
+  // Adds a callback for the specified entity when the specified mouse button is hit.
+  this.registerMouseListener = function(entity, button, callback) {
+    input.registerMouseListener(entity.id, button, callback);
+  }
+
+  // Removes all callbacks for the specified entity and mouse button.
+  this.degisterMouseListener = function(entity, button) {
+    input.degisterMouseListener(entity.id, button);
   }
 
   // Creates a new entity from the given constructor and params object
@@ -71,7 +81,6 @@ function World(width, height, viewSize) {
   // Does all the rendering for this frame.
   this.render = function() {
     push();
-    background(0);
     randomSeed(this.seed);
     push();
     for (var i = 0; i < 500; i++) {
