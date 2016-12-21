@@ -58,10 +58,6 @@ Entity.prototype.momentum = function() {
   return momentum;
 }
 
-Entity.calculateMoment = function(localPoint, force) {
-  return cross(localPoint, force) / localPoint.mag();
-}
-
 const g = 9.81;
 
 Entity.prototype.calculateMu = function(breakThrough) {
@@ -73,10 +69,14 @@ Entity.calculateDragCo = function(maxForce, maxVel) {
   return maxForce / (maxVel * maxVel);
 }
 
-Entity.globalPoint = function(localPoint) {
+Entity.calculateMoment = function(localPoint, force) {
+  return cross(localPoint, force) / localPoint.mag();
+}
+
+Entity.globalPoint = function(scope, localPoint) {
   var point = localPoint.copy();
-  point.rotate(this.heading);
-  point.add(this.pos);
+  point.rotate(scope.heading);
+  point.add(scope.pos);
   return point;
 }
 

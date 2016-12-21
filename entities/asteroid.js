@@ -12,11 +12,11 @@ function Asteroid(world, params) {
   this.vel = params.vel !== undefined ? params.vel : createVector(0, 0);
   Entity.prototype.applyForce.call(this, params.force !== undefined ? params.force : p5.Vector.random2D().mult(5000));
   Entity.prototype.applyTorque.call(this, random(-0.03, 0.03));
-  this.total = floor(random(7, 15));
   this.heading = params.heading !== undefined ? params.heading : 0;
 
   vertices = [];
   if (params.vertices === undefined) {
+    this.total = floor(random(7, 15));
     var range = this.r * 0.5;
     for (var i = 0; i < this.total; i++) {
       var angle = map(i, 0, this.total, 0, TWO_PI);
@@ -24,6 +24,7 @@ function Asteroid(world, params) {
       vertices.push(createVector(r * cos(angle), r * sin(angle)));
     }
   } else {
+    this.total = params.vertices.length;
     vertices = params.vertices;
   }
   this.shape = new Shape(vertices);

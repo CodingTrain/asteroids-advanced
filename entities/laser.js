@@ -54,12 +54,15 @@ function Laser(world, params) {
 
 
   this.collides = function(entity) {
-    if (entity.toString() !== "[object Asteroid]" ||
-      !Entity.prototype.collides.call(this, entity)) {
+    var tail = p5.Vector.sub(this.pos, this.vel);
+    if (entity.toString() !== "[object Asteroid]"
+      || !Entity.prototype.collides.call(this, entity) || !lineIntersectCircle(this.pos, tail, entity.pos, entity.r)) {
       return false;
     }
 
-    if (entity.shape.contains(p5.Vector.sub(this.pos, entity.pos))) return true;
+    var verts = entity.shape.vertices;
+    for (var i = 0, j = entity.total - 1; i < entity.total; j = i++)
+      if (lineIntersect(Entity.globalPoint(entity, verts[i]), Entity.globalPoint(entity, verts[j]), this.pos, tail)) return true;
     return false;
   }
 
