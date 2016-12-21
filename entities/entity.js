@@ -11,7 +11,9 @@ function Entity(params) {
   this.force = createVector(0, 0);
   this.torque = 0;
   this.velMu = 0;
+  this.velMuEnabled = true;
   this.rotMu = 0;
+  this.rotMuEnabled = true;
   this.velDrag = 0;
   this.velDragEnabled = true;
   this.rotDrag = 0;
@@ -65,11 +67,14 @@ Entity.calculateMoment = function(localPoint, force) {
 }
 
 Entity.calculateDragCo = function(maxForce, maxVel) {
-  return maxForce / (maxVel * maxVel)
+  return maxForce / (maxVel * maxVel);
 }
 
 Entity.prototype.collides = function(entity) {
-  if (!(this.canCollide && entity.canCollide)) return false;
+  if (!(this.canCollide && entity.canCollide)) {
+    return false;
+  }
+
   var dx = this.pos.x - entity.pos.x;
   var dy = this.pos.y - entity.pos.y;
   var dr = this.r + entity.r;
@@ -84,18 +89,13 @@ Entity.prototype.update = function() {
   }
 
   var R = this.mass * 9.81;
-  var F = this.velMu * R;
-
-  if (this.velMu > 0) {
+  if (this.velMuEnabled && this.velMu > 0) {
+    var F = this.velMu * R;
     if (this.vel.magSq() > 0) {
-      var normVel = this.vel.copy();
-      normVel.normalize();
-      var frict = normVel.copy();
-      frict.mult(-F);
+      var normVel = this.vel.copy().normalize();
+      var frict = normVel.copy().mult(-F);
       this.applyForce(frict);
-      var velocity = this.predictVelocity();
-      var dot = p5.Vector.dot(this.vel, velocity);
-      if (dot < 0) {
+      if (p5.Vector.dot(this.vel, this.predictVelocity()) < 0) {
         frict.mult(-1);
         var force = normVel;
         force.mult(-p5.Vector.dot(normVel, this.force.copy()));
@@ -104,48 +104,40 @@ Entity.prototype.update = function() {
         this.vel.mult(0);
       }
     } else if (this.force.magSq() > F * F) {
-      var frict = this.force.copy();
-      frict.normalize();
-      frict.mult(-F);
-      this.applyForce(frict);
-    } else this.force.mult(0);
+      this.applyForce(this.force.copy().normalize().mult(-F));
+    } else {
+      this.force.mult(0);
+    }
   }
 
-  var F = this.rotMu * R;
-
-  if (this.rotMu > 0) {
+  if (this.rotMuEnabled && this.rotMu > 0) {
+    var F = this.rotMu * R;
     if (this.rotation != 0) {
-      var frict = -F * (this.rotation > 0 ? 1 : -1);
-      this.applyTorque(frict);
-      var rotation = this.predictRotation();
-      if ((this.rotation > 0) != (rotation > 0)) {
+      this.applyTorque(-F * (this.rotation > 0 ? 1 : -1));
+      if ((this.rotation > 0) != (this.predictRotation() > 0)) {
         this.torque = 0;
         this.rotation = 0;
       }
     } else if (abs(this.torque) > F) {
-      var frict = -F * (this.torque > 0 ? 1 : -1);
-      this.applyTorque(frict);
-    } else this.torque = 0;
-
+      this.applyTorque(-F * (this.torque > 0 ? 1 : -1));
+    } else {
+      this.torque = 0;
+    }
   }
 
   if (this.velDragEnabled && this.velDrag != 0) {
-    var drag = this.vel.copy();
-    drag.mult(-this.velDrag * this.vel.mag());
-    this.applyForce(drag);
+    this.applyForce(this.vel.copy().mult(-this.velDrag * this.vel.mag()));
   }
 
   if (this.rotDragEnabled && this.rotDrag > 0) {
     var drag = this.rotDrag * this.rotation * this.rotation;
-    drag = this.rotation > 0 ? -drag : drag;
-    this.applyTorque(drag);
+    this.applyTorque(this.rotation > 0 ? -drag : drag);
   }
 
-  var accel = this.force.div(this.mass);
-  var rotAccel = this.torque / this.mass;
-
-  this.vel.add(accel);
-  this.rotation += rotAccel;
+  // Acceleration
+  this.vel.add(this.force.div(this.mass));
+  // Rotational Acceleration
+  this.rotation += this.torque / this.mass;
 
   this.pos.add(this.vel);
   this.heading += this.rotation;

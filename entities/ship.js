@@ -12,18 +12,21 @@ function Ship(world, params) {
   var respawnFramesReset = 300;
   var respawnFrames;
   this.mass = 1000;
-  this.maxThrust = params.maxThrust !== undefined ? params.maxThrust : 200;
   this.thrustPower = params.thrustPower !== undefined ? params.thrustPower : {
-    forward: 200,
+    forward: 100,
     backward: 20,
-    left: 100,
-    right: 100,
+    left: 80,
+    right: 80,
     stabilization: 200,
     rotation: 40
   };
+  this.maxThrust = params.maxThrust !== undefined ? params.maxThrust : 100;
   this.rotDragEnabled = false;
   this.velDragEnabled = true;
   this.velDrag = Entity.calculateDragCo(this.maxThrust, 20);
+  this.rotMuEnabled = false;
+  this.velMuEnabled = true;
+  this.velMu = 1 / this.thrustPower.stabilization;
   var front = createVector(4 / 3 * this.r, 0);
   this.shape = new Shape([
     createVector(-2 / 3 * this.r, -this.r),
@@ -47,7 +50,7 @@ function Ship(world, params) {
     laser: false
   };
 
-  this.setInputs = function (targetPoint, thrustForward, thrustBackwards, thrustLeft, thrustRight, stabilizationToggle, laser) {
+  this.setInputs = function(targetPoint, thrustForward, thrustBackwards, thrustLeft, thrustRight, stabilizationToggle, laser) {
     inputs.thrustVector = createVector(
       (thrustForward ? this.thrustPower.forward : 0) + (thrustBackwards ? -this.thrustPower.backward : 0),
       (thrustRight ? this.thrustPower.right : 0) + (thrustLeft ? -this.thrustPower.left : 0)
@@ -60,11 +63,11 @@ function Ship(world, params) {
     }
   }
 
-  this.registerId = function (id) {
+  this.registerId = function(id) {
     Entity.prototype.registerId.call(this, id);
   }
 
-  this.collides = function (entity) {
+  this.collides = function(entity) {
     if (this.shields > 0 ||
       entity.toString() !== "[object Asteroid]" ||
       !Entity.prototype.collides.call(this, entity)) {
@@ -83,10 +86,9 @@ function Ship(world, params) {
     return false;
   }
 
-  this.collision = function (entity) {
+  this.collision = function(entity) {
     if (entity.toString(entity) === "[object Asteroid]") {
       this.lives--;
-      // TODO: Do something with this variable.
       if (this.lives === 0 && this.owner !== -1) {
         world.getPlayer(this.owner).dead = true;
       }
@@ -97,11 +99,11 @@ function Ship(world, params) {
     }
   }
 
-  this.regenShields = function () {
+  this.regenShields = function() {
     this.shields = shieldDuration;
   }
 
-  this.update = function () {
+  this.update = function() {
 
     if (this.canCollide) {
       var force = p5.Vector.sub(inputs.targetPoint.copy(), front.copy().rotate(this.heading));
@@ -120,7 +122,7 @@ function Ship(world, params) {
       if (lastShot > 0) {
         lastShot--;
       } else if (inputs.laser) {
-        world.addEndFrameTask(function (world) {
+        world.addEndFrameTask(function(world) {
           world.createEntity(Laser, {
             pos: p5.Vector.fromAngle(scope.heading).mult(scope.r).add(scope.pos),
             heading: scope.heading,
@@ -131,7 +133,7 @@ function Ship(world, params) {
         lastShot = rateOfFire;
       }
 
-      //stabToggle && (inputs.thrustVector.x === 0 && inputs.thrustVector.y === 0);
+      this.velMuEnabled = stabToggle && (inputs.thrustVector.x === 0 && inputs.thrustVector.y === 0);
       if (Entity.prototype.update.call(this)) {
         return true;
       }
@@ -142,7 +144,7 @@ function Ship(world, params) {
     }
   }
 
-  this.render = function () {
+  this.render = function() {
     if (!this.canCollide) {
       push();
       stroke(255, 255, 255, this.shape.fade());
@@ -171,7 +173,7 @@ function Ship(world, params) {
     }
   }
 
-  this.reset = function () {
+  this.reset = function() {
     this.canCollide = true;
     this.regenShields();
     this.pos.set(resetPos.x, resetPos.y);
@@ -179,11 +181,11 @@ function Ship(world, params) {
     this.lastShot = 0;
   }
 
-  this.globalVertices = function () {
+  this.globalVertices = function() {
     return this.shape.globalVertices(this.pos, this.heading);
   }
 
-  this.toString = function () {
+  this.toString = function() {
     return "[object Ship]";
   }
 }
