@@ -120,21 +120,20 @@ function Ship(world, params) {
   }
 
   this.render = function() {
+    push();
+    translate(this.pos.x, this.pos.y);
+    rotate(this.heading);
+    colorMode(RGB);
+    fill(0, 0, 255);
+    strokeWeight(3);
     if (!this.canCollide) {
-      push();
+      strokeCap(ROUND);
       stroke(255, 255, 255, this.shape.fade());
-      translate(this.pos.x, this.pos.y);
-      rotate(this.heading);
       if (!this.shape.draw()) {
         this.reset();
         if (this.lives === 0) this.dead = true;
       }
-      pop();
     } else {
-      push();
-      translate(this.pos.x, this.pos.y);
-      rotate(this.heading);
-      noFill();
       var shieldCol = random(map(this.shields, 0, shieldDuration, 255, 0), 255);
       stroke(shieldCol, shieldCol, 255);
       this.shape.draw();
@@ -144,8 +143,8 @@ function Ship(world, params) {
         stroke(fireColors[floor(random(fireColors.length))]);
         line(0, 0, 0, 10);
       }
-      pop();
     }
+    pop();
   }
 
   this.reset = function() {

@@ -46,8 +46,10 @@ function Asteroid(world, params) {
 
   this.render = function() {
     push();
+    strokeWeight(3);
     stroke(255, 255, 255, this.shape.fade());
-    noFill();
+    colorMode(RGB)
+    fill(102, 51, 0);
     translate(this.pos.x, this.pos.y);
     rotate(this.heading);
     if (!this.shape.draw()) this.dead = true;
