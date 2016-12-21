@@ -27,8 +27,8 @@ function Ship(world, params) {
     velDrag: Entity.calculateDragCo(this.maxThrust, 15),
     rotDrag: 0
   }
-  this.velMu = coefficients.velMu;
-  this.velDrag = coefficients.velDrag;
+  this.velMu = this.coefficients.velMu;
+  this.velDrag = this.coefficients.velDrag;
   var front = createVector(4 / 3 * this.r, 0);
   this.shape = new Shape([
     createVector(-2 / 3 * this.r, -this.r),
@@ -136,7 +136,7 @@ function Ship(world, params) {
         lastShot = rateOfFire;
       }
 
-      this.velMu = stabToggle && (inputs.thrustVector.x === 0 && inputs.thrustVector.y === 0) ? coefficients.velMu : 0;
+      this.velMu = stabToggle && (inputs.thrustVector.x === 0 && inputs.thrustVector.y === 0) ? this.coefficients.velMu : 0;
       if (Entity.prototype.update.call(this)) {
         return true;
       }

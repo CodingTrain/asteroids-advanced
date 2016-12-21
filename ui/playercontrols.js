@@ -34,7 +34,7 @@ function PlayerControls(id) {
     textSize(32);
     textAlign(LEFT);
     fill(255);
-    if (world.getLocalPlayer().getEntity().velMuEnabled) {
+    if (world.getLocalPlayer().getEntity().velMu > 0) {
       text("Stabilizers ON", 10, windowHeight - 10);
     } else {
       text("Stabilizers OFF", 10, windowHeight - 10);
