@@ -50,11 +50,11 @@ function Ship(world, params) {
     laser: false
   };
   
-  var upRight = p5.Vector.dot(p5.Vector.fromAngle(this.heading), createVector(0, -1));
   this.setInputs = function(targetPoint, thrustForward, thrustBackwards, thrustLeft, thrustRight, stabilizationToggle, laser) {
+    var upRight = p5.Vector.dot(p5.Vector.fromAngle(this.heading), createVector(0, -1));
     inputs.thrustVector = createVector(
       (thrustForward ? this.thrustPower.forward : 0) + (thrustBackwards ? -this.thrustPower.backward : 0),
-      (upRight > 0 ? 1 : -1) * ((thrustRight ? this.thrustPower.right : 0) + (thrustLeft ? -this.thrustPower.left : 0))
+      (upRight > -0.259 ? 1 : -1) * ((thrustRight ? this.thrustPower.right : 0) + (thrustLeft ? -this.thrustPower.left : 0))
     );
     inputs.targetPoint = targetPoint;
     inputs.laser = laser;
