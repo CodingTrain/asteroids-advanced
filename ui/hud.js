@@ -1,5 +1,7 @@
 function Hud(id) {
-  UIElement.call(this, id, { pos: createVector(0, 0) });
+  UIElement.call(this, id, {
+    pos: createVector(0, 0)
+  });
   var size = 20;
   var padding = 10;
   var lifeWidth = 20;
@@ -27,21 +29,23 @@ function Hud(id) {
 
   ];
 
-  this.render = function(world) {
+  this.render = function (world) {
     player = world.getLocalPlayer();
     var scoreString = "" + player.score;
     var digitPos = createVector((width / 2 - (scoreString.length * (size + padding) - padding) / 2), padding);
-    for(var i = 0; i < scoreString.length; i++) {
+    for (var i = 0; i < scoreString.length; i++) {
       var dmap = digitMaps[scoreString.charAt(i)];
       drawDigit(dmap, i, digitPos);
       digitPos.x += size + padding;
     }
     drawLives();
-    if(player.dead) {
+    if (player.dead) {
       push();
       textSize(32);
       fill(255);
-      text("GAME OVER", (width / 2) - 100, height / 2);
+      textAlign(CENTER);
+      text("GAME OVER", width / 2, height / 2);
+      pop();
     }
   }
 
@@ -51,7 +55,7 @@ function Hud(id) {
     stroke(255);
     fill(0);
     var top = createVector((width / 2) + (lifeWidth + padding) * (lives - 1) / 2, padding * 2 + size * 2);
-    for(var i = 0; i < lives; i++) {
+    for (var i = 0; i < lives; i++) {
       triangle(top.x, top.y, top.x - lifeWidth / 2, top.y + 25, top.x + lifeWidth / 2, top.y + 25);
       top.x -= lifeWidth + padding;
     }
@@ -62,8 +66,8 @@ function Hud(id) {
   function drawDigit(digitMap, index, pos) {
     push();
     stroke(255);
-    for(var i = 0; i < digitMap.length; i++) {
-      if(digitMap[i] === true) {
+    for (var i = 0; i < digitMap.length; i++) {
+      if (digitMap[i] === true) {
         drawLine(i, pos);
       }
     }
@@ -72,7 +76,7 @@ function Hud(id) {
 
   //draws a line based on the line map
   function drawLine(lineMap, pos) {
-    switch(lineMap) {
+    switch (lineMap) {
       case 0:
         line(pos.x, pos.y, pos.x + size, pos.y);
         break;
