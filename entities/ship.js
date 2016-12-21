@@ -13,17 +13,17 @@ function Ship(world, params) {
   var respawnFrames;
   this.mass = 1000;
   this.thrustPower = params.thrustPower !== undefined ? params.thrustPower : {
-    forward: 100,
-    backward: 20,
-    left: 80,
-    right: 80,
+    forward: 200,
+    backward: 100,
+    left: 180,
+    right: 180,
     stabilization: 200,
-    rotation: 40
+    rotation: 80
   };
   this.maxThrust = params.maxThrust !== undefined ? params.maxThrust : 100;
   this.rotDragEnabled = false;
   this.velDragEnabled = true;
-  this.velDrag = Entity.calculateDragCo(this.maxThrust, 20);
+  this.velDrag = Entity.calculateDragCo(this.maxThrust, 15);
   this.rotMuEnabled = false;
   this.velMuEnabled = true;
   this.velMu = 1 / this.thrustPower.stabilization;

@@ -9,7 +9,9 @@ function PlayerControls(id) {
     down: false,
     f: false,
     space: false,
-    spacerepeat: false
+    spacerepeat: false,
+    leftmouse: false,
+    leftmouserepeat: false
   };
 
   this.update = function(world) {
@@ -20,9 +22,10 @@ function PlayerControls(id) {
       keys.left,
       keys.right,
       keys.f,
-      keys.space || keys.space.repeat
+      keys.space || keys.space.repeat || keys.leftmouse || keys.leftmouserepeat
     );
     keys.space = false;
+    keys.leftmouse = false;
     keys.f = false;
   }
 
@@ -39,26 +42,32 @@ function PlayerControls(id) {
   }
 
   var scope = this;
-  world.registerListener(id, " ".charCodeAt(0), function(char, code, press) {
+  world.registerKeyListener(id, " ".charCodeAt(0), function(char, code, press) {
     keys.spacerepeat = press;
     if (press) {
       keys.space = true;
     }
   });
-  world.registerListener(id, "F".charCodeAt(0), function(char, code, press) {
+  world.registerKeyListener(id, "F".charCodeAt(0), function(char, code, press) {
     keys.f = press;
   });
-  world.registerListener(id, "D".charCodeAt(0), function(char, code, press) {
+  world.registerKeyListener(id, "D".charCodeAt(0), function(char, code, press) {
     keys.right = press;
   });
-  world.registerListener(id, "A".charCodeAt(0), function(char, code, press) {
+  world.registerKeyListener(id, "A".charCodeAt(0), function(char, code, press) {
     keys.left = press;
   });
-  world.registerListener(id, "W".charCodeAt(0), function(char, code, press) {
+  world.registerKeyListener(id, "W".charCodeAt(0), function(char, code, press) {
     keys.up = press;
   });
-  world.registerListener(id, "S".charCodeAt(0), function(char, code, press) {
+  world.registerKeyListener(id, "S".charCodeAt(0), function(char, code, press) {
     keys.down = press;
+  });
+  world.registerMouseListener(id, LEFT, function(button, press) {
+    keys.leftmouserepeat = press;
+    if (press) {
+      keys.leftmouse = true;
+    }
   });
 }
 

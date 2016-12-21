@@ -15,41 +15,51 @@ function World(width, height, viewSize) {
 
   // Returns the player playing on this machine.
   // TODO: Currently returns the first player as we only have one.
-  this.getLocalPlayer = function () {
+  this.getLocalPlayer = function() {
     return players[0];
   }
 
   // Returns the player with the specific id.
-  this.getPlayer = function (id) {
+  this.getPlayer = function(id) {
     return players[id];
   }
 
   // Adds a function to a stack, will be called at the end of the frame once
   // all the other logic is completed.
-  this.addEndFrameTask = function (callback) {
+  this.addEndFrameTask = function(callback) {
     endFrameTasks.push(callback);
   }
 
-  // Adds a callback for the specified entity when the specified code is hit.
-  this.registerListener = function (entity, code, callback) {
-    input.registerListener(entity.id, code, callback);
+  // Adds a callback for the specified entity when the specified keycode is hit.
+  this.registerKeyListener = function(entity, code, callback) {
+    input.registerKeyListener(entity.id, code, callback);
   }
 
-  // Removes all callbacks for the specified entity and code.
-  this.degisterListener = function (entity, code) {
-    input.degisterListener(entity.id, code);
+  // Removes all callbacks for the specified entity and keycode.
+  this.degisterKeyListener = function(entity, code) {
+    input.degisterKeyListener(entity.id, code);
+  }
+
+  // Adds a callback for the specified entity when the specified mouse button is hit.
+  this.registerMouseListener = function(entity, button, callback) {
+    input.registerMouseListener(entity.id, button, callback);
+  }
+
+  // Removes all callbacks for the specified entity and mouse button.
+  this.degisterMouseListener = function(entity, button) {
+    input.degisterMouseListener(entity.id, button);
   }
 
   // Creates a new entity from the given constructor and params object
   // and adds it to the world.
-  this.createEntity = function (entity, params) {
+  this.createEntity = function(entity, params) {
     var entity = new entity(world, params);
     entitymanager.add(entity);
     return entity;
   }
 
   // Initializes the world.
-  this.initialize = function () {
+  this.initialize = function() {
     players[0] = new Player(players.length, "SomeRandomName", this);
     entitymanager.add(players[0].getEntity());
     levelmanager = new LevelManager(this, players[0].getEntity(), 0);
@@ -57,7 +67,7 @@ function World(width, height, viewSize) {
   }
 
   // Does all the update logic for this frame.
-  this.update = function () {
+  this.update = function() {
     entitymanager.update();
     entitymanager.checkCollisions();
     levelmanager.update(players);
@@ -69,7 +79,7 @@ function World(width, height, viewSize) {
   }
 
   // Does all the rendering for this frame.
-  this.render = function () {
+  this.render = function() {
     push();
     randomSeed(this.seed);
     push();
