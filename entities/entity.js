@@ -62,8 +62,22 @@ Entity.calculateMoment = function(localPoint, force) {
   return cross(localPoint, force) / localPoint.mag();
 }
 
+const g = 9.81;
+
+Entity.prototype.calculateMu = function(breakThrough) {
+  var R = this.mass * g;
+  return breakThrough / R;
+}
+
 Entity.calculateDragCo = function(maxForce, maxVel) {
   return maxForce / (maxVel * maxVel)
+}
+
+Entity.globalPoint = function(localPoint) {
+  var point = localPoint.copy();
+  point.rotate(this.heading);
+  point.add(this.pos);
+  return point;
 }
 
 Entity.prototype.collides = function(entity) {
@@ -81,7 +95,7 @@ Entity.prototype.update = function() {
     return true;
   }
 
-  var R = this.mass * 9.81;
+  var R = this.mass * g;
   var F = this.velMu * R;
 
   if (this.velMu > 0) {

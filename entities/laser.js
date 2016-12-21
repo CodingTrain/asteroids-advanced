@@ -31,7 +31,7 @@ function Laser(world, params) {
   this.vel = p5.Vector.fromAngle(params.heading);
   this.vel.mult(20);
   this.color = colors[floor(random(0, colors.length - 1))];
-  this.life = params.life !== undefined ? params.life : 100;
+  this.life = params.life !== undefined ? params.life : 50;
   var maxlife = this.life;
 
   playSoundEffect(laserSoundEffect[floor(random(3))]);
@@ -43,9 +43,12 @@ function Laser(world, params) {
 
   this.render = function() {
     push();
+    translate(this.pos.x, this.pos.y);
     stroke(this.color[0], this.color[1], this.color[2], 55 + 200 * this.life / maxlife);
     strokeWeight(this.r);
-    point(this.pos.x, this.pos.y);
+    var halfLine = this.vel.copy();
+    halfLine.mult(0.5);
+    line(-halfLine.x, -halfLine.y, halfLine.x, halfLine.y);
     pop();
   }
 
@@ -56,13 +59,7 @@ function Laser(world, params) {
       return false;
     }
 
-    var last_pos = p5.Vector.sub(this.pos, p5.Vector.mult(this.vel, 2));
-    var asteroid_vertices = entity.globalVertices();
-    for (var i = 0; i < asteroid_vertices.length; i++) {
-      if (lineIntersect(last_pos, this.pos, asteroid_vertices[i], asteroid_vertices[(i + 1) % asteroid_vertices.length])) {
-        return true;
-      }
-    }
+    if (entity.shape.contains(p5.Vector.sub(this.pos, entity.pos))) return true;
     return false;
   }
 
