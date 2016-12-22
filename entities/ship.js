@@ -21,18 +21,28 @@ function Ship(world, params) {
     rotation: 80
   };
   this.maxThrust = params.maxThrust !== undefined ? params.maxThrust : 100;
-  this.rotDragEnabled = false;
-  this.velDragEnabled = true;
-  this.velDrag = Entity.calculateDragCo(this.maxThrust, 15);
-  this.rotMuEnabled = false;
-  this.velMuEnabled = true;
-  this.velMu = 1 / this.thrustPower.stabilization;
-  var front = createVector(4 / 3 * this.r, 0);
+  this.coefficients = {
+    velMu: 1 / this.thrustPower.stabilization,
+    rotMu: 0,
+    velDrag: Entity.calculateDragCo(this.maxThrust, 15),
+    rotDrag: 0
+  }
+  this.velMu = this.coefficients.velMu;
+  this.velDrag = this.coefficients.velDrag;
+  this.front = createVector(4 / 3 * this.r, 0);
   this.shape = new Shape([
     createVector(-2 / 3 * this.r, -this.r),
     createVector(-2 / 3 * this.r, this.r),
-    front
+    this.front
   ]);
+  this.colors = [
+    color(243, 89 , 86 ),
+    color(241, 197, 0  ),
+    color(73 , 187, 108),
+    color(36 , 148, 193),
+    color(150, 89 , 167)
+  ]
+  this.colorIndex = 0;
 
   var fireColors = [];
   for (var i = 0; i * 10 <= 255; i++) {
@@ -40,7 +50,7 @@ function Ship(world, params) {
   }
 
   var stabToggle = true;
-  var rateOfFire = 20;
+  var rateOfFire = 40;
   var lastShot = 0;
   var scope = this;
 
@@ -49,7 +59,7 @@ function Ship(world, params) {
     thrustVector: createVector(0, 0),
     laser: false
   };
-  
+
   this.setInputs = function(targetPoint, thrustForward, thrustBackwards, thrustLeft, thrustRight, stabilizationToggle, laser) {
     var upRight = p5.Vector.dot(p5.Vector.fromAngle(this.heading), createVector(0, -1));
     inputs.thrustVector = createVector(
@@ -107,7 +117,7 @@ function Ship(world, params) {
   this.update = function() {
 
     if (this.canCollide) {
-      var force = p5.Vector.sub(inputs.targetPoint.copy(), front.copy().rotate(this.heading));
+      var force = p5.Vector.sub(inputs.targetPoint.copy(), this.front.copy().rotate(this.heading));
       force.normalize();
       force.mult(this.thrustPower.rotation);
       this.applyTorque(Entity.calculateMoment(inputs.targetPoint, force));
@@ -123,18 +133,22 @@ function Ship(world, params) {
       if (lastShot > 0) {
         lastShot--;
       } else if (inputs.laser) {
+        var temp = this.colors[0];
         world.addEndFrameTask(function(world) {
           world.createEntity(Laser, {
-            pos: p5.Vector.fromAngle(scope.heading).mult(scope.r).add(scope.pos),
+            pos: scope.front.copy().add(createVector(20, 0)).rotate(scope.heading).add(scope.pos),
             heading: scope.heading,
+            c: scope.colors[scope.colorIndex],
             initialVel: scope.vel,
             owner: scope.owner
           });
+          scope.colorIndex++;
+          scope.colorIndex %= scope.colors.length;
         });
         lastShot = rateOfFire;
       }
 
-      this.velMuEnabled = stabToggle && (inputs.thrustVector.x === 0 && inputs.thrustVector.y === 0);
+      this.velMu = stabToggle && (inputs.thrustVector.x === 0 && inputs.thrustVector.y === 0) ? this.coefficients.velMu : 0;
       if (Entity.prototype.update.call(this)) {
         return true;
       }
@@ -146,21 +160,20 @@ function Ship(world, params) {
   }
 
   this.render = function() {
+    push();
+    translate(this.pos.x, this.pos.y);
+    rotate(this.heading);
+    colorMode(RGB);
+    noFill();
+    strokeWeight(3);
     if (!this.canCollide) {
-      push();
+      strokeCap(ROUND);
       stroke(255, 255, 255, this.shape.fade());
-      translate(this.pos.x, this.pos.y);
-      rotate(this.heading);
       if (!this.shape.draw()) {
         this.reset();
         if (this.lives === 0) this.dead = true;
       }
-      pop();
     } else {
-      push();
-      translate(this.pos.x, this.pos.y);
-      rotate(this.heading);
-      noFill();
       var shieldCol = random(map(this.shields, 0, shieldDuration, 255, 0), 255);
       stroke(shieldCol, shieldCol, 255);
       this.shape.draw();
@@ -170,8 +183,8 @@ function Ship(world, params) {
         stroke(fireColors[floor(random(fireColors.length))]);
         line(0, 0, 0, 10);
       }
-      pop();
     }
+    pop();
   }
 
   this.reset = function() {

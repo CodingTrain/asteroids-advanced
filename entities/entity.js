@@ -11,13 +11,9 @@ function Entity(params) {
   this.force = createVector(0, 0);
   this.torque = 0;
   this.velMu = 0;
-  this.velMuEnabled = true;
   this.rotMu = 0;
-  this.rotMuEnabled = true;
   this.velDrag = 0;
-  this.velDragEnabled = true;
   this.rotDrag = 0;
-  this.rotDragEnabled = true;
   this.owner = params.owner !== undefined ? params.owner : -1;
 }
 
@@ -62,12 +58,26 @@ Entity.prototype.momentum = function() {
   return momentum;
 }
 
-Entity.calculateMoment = function(localPoint, force) {
-  return cross(localPoint, force) / localPoint.mag();
+const g = 9.81;
+
+Entity.prototype.calculateMu = function(breakThrough) {
+  var R = this.mass * g;
+  return breakThrough / R;
 }
 
 Entity.calculateDragCo = function(maxForce, maxVel) {
   return maxForce / (maxVel * maxVel);
+}
+
+Entity.calculateMoment = function(localPoint, force) {
+  return cross(localPoint, force) / localPoint.mag();
+}
+
+Entity.globalPoint = function(scope, localPoint) {
+  var point = localPoint.copy();
+  point.rotate(scope.heading);
+  point.add(scope.pos);
+  return point;
 }
 
 Entity.prototype.collides = function(entity) {
@@ -88,8 +98,8 @@ Entity.prototype.update = function() {
     return true;
   }
 
-  var R = this.mass * 9.81;
-  if (this.velMuEnabled && this.velMu > 0) {
+  var R = this.mass * g;
+  if (this.velMu > 0) {
     var F = this.velMu * R;
     if (this.vel.magSq() > 0) {
       var normVel = this.vel.copy().normalize();
@@ -110,7 +120,7 @@ Entity.prototype.update = function() {
     }
   }
 
-  if (this.rotMuEnabled && this.rotMu > 0) {
+  if (this.rotMu > 0) {
     var F = this.rotMu * R;
     if (this.rotation != 0) {
       this.applyTorque(-F * (this.rotation > 0 ? 1 : -1));
@@ -125,25 +135,25 @@ Entity.prototype.update = function() {
     }
   }
 
-  if (this.velDragEnabled && this.velDrag != 0) {
+  if (this.velDrag != 0) {
     this.applyForce(this.vel.copy().mult(-this.velDrag * this.vel.mag()));
   }
 
-  if (this.rotDragEnabled && this.rotDrag > 0) {
+  if (this.rotDrag > 0) {
     var drag = this.rotDrag * this.rotation * this.rotation;
     this.applyTorque(this.rotation > 0 ? -drag : drag);
   }
 
   // Acceleration
-  this.vel.add(this.force.div(this.mass));
+  if (this.force.x != 0 || this.force.y != 0) this.vel.add(this.force.div(this.mass));
   // Rotational Acceleration
-  this.rotation += this.torque / this.mass;
+  if (this.torque != 0) this.rotation += this.torque / this.mass;
 
   this.pos.add(this.vel);
   this.heading += this.rotation;
 
   this.edges();
-  this.force.mult(0);
+  if (this.force.x != 0 || this.force.y != 0) this.force.mult(0);
   this.torque = 0;
 }
 

@@ -2,6 +2,16 @@ function cross(v1, v2) {
   return v1.x * v2.y - v2.x * v1.y;
 }
 
+function lineIntersectCircle(l1, l2, c, r) {
+  var dx = l2.x - l1.x;
+  var dy = l2.y - l1.y;
+  var dx2 = c.x - l1.x;
+  var dy2 = c.y - l1.y;
+  var x = dx * dx + dy * dy;
+  var a = pow(dx2 * dy - dy2 * dx, 2) / x;
+  return a <= r * r;
+}
+
 //intersection between two closed of lines
 function lineIntersect(l1v1, l1v2, l2v1, l2v2) {
   var base = p5.Vector.sub(l1v1, l2v1);
