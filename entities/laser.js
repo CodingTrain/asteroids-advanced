@@ -52,14 +52,14 @@ function Laser(world, params) {
 
   this.collides = function(entity) {
     if (entity.toString() !== "[object Asteroid]" ||
-        !Entity.prototype.collides.call(this, entity)){
+      !Entity.prototype.collides.call(this, entity)) {
       return false;
     }
 
-    var last_pos = p5.Vector.sub(this.pos, this.vel);
+    var last_pos = p5.Vector.sub(this.pos, p5.Vector.mult(this.vel, 2));
     var asteroid_vertices = entity.globalVertices();
-    for(var i = 0; i < asteroid_vertices.length; i++) {
-      if(lineIntersect(last_pos, this.pos, asteroid_vertices[i], asteroid_vertices[(i + 1) % asteroid_vertices.length])) {
+    for (var i = 0; i < asteroid_vertices.length; i++) {
+      if (lineIntersect(last_pos, this.pos, asteroid_vertices[i], asteroid_vertices[(i + 1) % asteroid_vertices.length])) {
         return true;
       }
     }
@@ -72,7 +72,9 @@ function Laser(world, params) {
     }
   }
 
-  this.toString = function() { return "[object Laser]"; }
+  this.toString = function() {
+    return "[object Laser]";
+  }
 }
 
 Laser.prototype = Object.create(Entity.prototype);

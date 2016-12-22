@@ -1,5 +1,4 @@
-function Entity(params)
-{
+function Entity(params) {
   this.id = -1;
   this.canCollide = true;
   this.dead = false;
@@ -16,8 +15,7 @@ Entity.prototype.registerId = function(id) {
   this.id = id;
 }
 
-Entity.prototype.setAccel = function(magnitude)
-{
+Entity.prototype.setAccel = function(magnitude) {
   this.accelMagnitude = magnitude;
 }
 
