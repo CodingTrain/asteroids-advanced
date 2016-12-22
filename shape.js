@@ -34,11 +34,7 @@ function Shape(vertices) {
 
   //calculates the area within a shape
   this.area = function() {
-    var area = 0;
-    for (var i = 0; i < this.vertices.length - 1; i++) {
-      area += this.vertices[i].x * this.vertices[i + 1].y - this.vertices[i].y * this.vertices[i + 1].x;
-    }
-    return abs(area / 2);
+    return Shape.area(this.vertices);
   }
 
   //checks if the shape contains a specific point
@@ -104,6 +100,14 @@ function Shape(vertices) {
 
   }
 
+}
+
+Shape.area = function(vertices) {
+  var area = 0;
+  for (var i = 0; i < vertices.length - 1; i++) {
+    area += vertices[i].x * vertices[i + 1].y - vertices[i].y * vertices[i + 1].x;
+  }
+  return abs(area / 2);
 }
 
 Shape.smooth = function(vertices, loop_) {

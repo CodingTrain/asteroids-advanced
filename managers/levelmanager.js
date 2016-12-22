@@ -6,7 +6,6 @@ function LevelManager(world, level) {
 
   this.recordKill = function(asteroid, killerId) {
     asteroids--;
-    console.log(killerId);
     if (killerId !== -1) {
       world.getPlayer(killerId).score += floor(asteroid.shape.area() / 100);
     }
