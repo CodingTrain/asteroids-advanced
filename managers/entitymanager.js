@@ -31,9 +31,19 @@ function EntityManager() {
       if (relPos.y - entity.r > windowHeight / 2) trans.y -= world.height;
       else if (relPos.y + entity.r < -windowHeight / 2) trans.y += world.height;
 
+      var drawPos = p5.Vector.add(trans, relPos);
+      var shouldRender = !(
+        (drawPos.x - entity.r >  windowWidth / 2) ||
+        (drawPos.x + entity.r < -windowWidth / 2) ||
+        (drawPos.y - entity.r >  windowHeight / 2) ||
+        (drawPos.y + entity.r < -windowHeight / 2)
+      );
+
       push();
-      translate(trans.x, trans.y);
-      entities[index].render();
+      if (shouldRender) {
+        translate(trans.x, trans.y);
+        entity.render();
+      }
       pop();
     }
   }

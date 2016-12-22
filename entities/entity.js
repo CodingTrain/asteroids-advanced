@@ -145,15 +145,15 @@ Entity.prototype.update = function() {
   }
 
   // Acceleration
-  this.vel.add(this.force.div(this.mass));
+  if (this.force.x != 0 || this.force.y != 0) this.vel.add(this.force.div(this.mass));
   // Rotational Acceleration
-  this.rotation += this.torque / this.mass;
+  if (this.torque != 0) this.rotation += this.torque / this.mass;
 
   this.pos.add(this.vel);
   this.heading += this.rotation;
 
   this.edges();
-  this.force.mult(0);
+  if (this.force.x != 0 || this.force.y != 0) this.force.mult(0);
   this.torque = 0;
 }
 
