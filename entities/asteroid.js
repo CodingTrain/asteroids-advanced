@@ -51,7 +51,7 @@ function Asteroid(world, params) {
     push();
     strokeWeight(3);
     colorMode(RGB);
-    noFill(50);
+    noFill();
     if (this.canCollide) {
       stroke(255);
     } else {
