@@ -35,9 +35,9 @@ function PlayerControls(id) {
     textAlign(LEFT);
     fill(255);
     if (world.getLocalPlayer().getEntity().velMu > 0) {
-      text("Stabilizers ON", 10, windowHeight - 10);
+      text("(FPS: " + floor(frameRate()) + ") Stabilizers ON", 10, windowHeight - 10);
     } else {
-      text("Stabilizers OFF", 10, windowHeight - 10);
+      text("(FPS: " + floor(frameRate()) + ") Stabilizers OFF", 10, windowHeight - 10);
     }
   }
 
