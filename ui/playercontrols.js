@@ -22,7 +22,7 @@ function PlayerControls(id) {
       keys.left,
       keys.right,
       keys.f,
-      keys.space || keys.space.repeat || keys.leftmouse || keys.leftmouserepeat
+      keys.space || keys.spacerepeat || keys.leftmouse || keys.leftmouserepeat
     );
     keys.space = false;
     keys.leftmouse = false;

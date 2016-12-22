@@ -13,6 +13,7 @@ function Asteroid(world, params) {
   Entity.prototype.applyForce.call(this, params.force !== undefined ? params.force : p5.Vector.random2D().mult(5000));
   Entity.prototype.applyTorque.call(this, random(-0.03, 0.03));
   this.heading = params.heading !== undefined ? params.heading : 0;
+  this.c = params.c !== undefined ? params.c : color(126);
 
   vertices = [];
   if (params.vertices === undefined) {
@@ -48,9 +49,13 @@ function Asteroid(world, params) {
   this.render = function() {
     push();
     strokeWeight(3);
-    stroke(255, 255, 255, this.shape.fade());
-    colorMode(RGB)
-    fill(102, 51, 0);
+    colorMode(RGB);
+    fill(this.c);
+    if (this.canCollide) {
+      stroke(255);
+    } else {
+      stroke(red(this.c), green(this.c), blue(this.c), this.shape.fade());
+    }
     translate(this.pos.x, this.pos.y);
     rotate(this.heading);
     if (!this.shape.draw()) this.dead = true;
@@ -63,7 +68,8 @@ function Asteroid(world, params) {
     if (!this.dead && entity.toString() === "[object Laser]") {
       playSoundEffect(explosionSoundEffects[floor(random(0, explosionSoundEffects.length))]);
 
-      if (this.shape.area < 1200) {
+      this.c = entity.c;
+      if (this.shape.area() < 1200) {
         this.shape.breakAnime();
         this.canCollide = false;
         this.rotation = 0;
@@ -213,6 +219,7 @@ Asteroid.prototype.splitAt = function(impactPos, levelmanager) {
       vel: scope.vel.copy(),
       force: pos1_offset.normalize().mult(2000),
       heading: scope.heading,
+      c: scope.c,
       levelmanager: levelmanager
     });
     world.createEntity(Asteroid, {
@@ -222,6 +229,7 @@ Asteroid.prototype.splitAt = function(impactPos, levelmanager) {
       vel: scope.vel.copy(),
       force: pos2_offset.normalize().mult(2000),
       heading: scope.heading,
+      c: scope.c,
       levelmanager: levelmanager
     });
   });

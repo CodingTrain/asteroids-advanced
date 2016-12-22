@@ -29,12 +29,20 @@ function Ship(world, params) {
   }
   this.velMu = this.coefficients.velMu;
   this.velDrag = this.coefficients.velDrag;
-  var front = createVector(4 / 3 * this.r, 0);
+  this.front = createVector(4 / 3 * this.r, 0);
   this.shape = new Shape([
     createVector(-2 / 3 * this.r, -this.r),
     createVector(-2 / 3 * this.r, this.r),
-    front
+    this.front
   ]);
+  this.colors = [
+    color(243, 89 , 86 ),
+    color(241, 197, 0  ),
+    color(73 , 187, 108),
+    color(36 , 148, 193),
+    color(150, 89 , 167)
+  ]
+  this.colorIndex = 0;
 
   var fireColors = [];
   for (var i = 0; i * 10 <= 255; i++) {
@@ -42,7 +50,7 @@ function Ship(world, params) {
   }
 
   var stabToggle = true;
-  var rateOfFire = 20;
+  var rateOfFire = 40;
   var lastShot = 0;
   var scope = this;
 
@@ -109,7 +117,7 @@ function Ship(world, params) {
   this.update = function() {
 
     if (this.canCollide) {
-      var force = p5.Vector.sub(inputs.targetPoint.copy(), front.copy().rotate(this.heading));
+      var force = p5.Vector.sub(inputs.targetPoint.copy(), this.front.copy().rotate(this.heading));
       force.normalize();
       force.mult(this.thrustPower.rotation);
       this.applyTorque(Entity.calculateMoment(inputs.targetPoint, force));
@@ -125,13 +133,17 @@ function Ship(world, params) {
       if (lastShot > 0) {
         lastShot--;
       } else if (inputs.laser) {
+        var temp = this.colors[0];
         world.addEndFrameTask(function(world) {
           world.createEntity(Laser, {
-            pos: p5.Vector.fromAngle(scope.heading).mult(scope.r).add(scope.pos),
+            pos: scope.front.copy().add(createVector(20, 0)).rotate(scope.heading).add(scope.pos),
             heading: scope.heading,
+            c: scope.colors[scope.colorIndex],
             initialVel: scope.vel,
             owner: scope.owner
           });
+          scope.colorIndex++;
+          scope.colorIndex %= scope.colors.length;
         });
         lastShot = rateOfFire;
       }
@@ -152,7 +164,7 @@ function Ship(world, params) {
     translate(this.pos.x, this.pos.y);
     rotate(this.heading);
     colorMode(RGB);
-    fill(0, 0, 255);
+    fill(this.colors[this.colorIndex]);
     strokeWeight(3);
     if (!this.canCollide) {
       strokeCap(ROUND);
