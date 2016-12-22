@@ -22,15 +22,15 @@ Entity.prototype.registerId = function(id) {
 }
 
 Entity.prototype.edges = function() {
-  if (this.pos.x > world.halfwidth) {
-    this.pos.x = this.pos.x % world.halfwidth - world.halfwidth;
-  } else if (this.pos.x < -world.halfwidth) {
-    this.pos.x = this.pos.x % world.halfwidth + world.halfwidth;
+  if (this.pos.x + this.r > world.halfwidth) {
+    this.pos.x = (this.pos.x + this.r) % world.halfwidth - world.halfwidth - this.r;
+  } else if (this.pos.x - this.r < -world.halfwidth) {
+    this.pos.x = (this.pos.x - this.r) % world.halfwidth + world.halfwidth + this.r;
   }
-  if (this.pos.y > world.halfheight) {
-    this.pos.y = this.pos.y % world.halfwidth - world.halfheight;
-  } else if (this.pos.y < -world.halfheight) {
-    this.pos.y = this.pos.y % world.halfwidth + world.halfheight;
+  if (this.pos.y + this.r > world.halfheight) {
+    this.pos.y = (this.pos.y + this.r) % world.halfwidth - world.halfheight - this.r;
+  } else if (this.pos.y - this.r < -world.halfheight) {
+    this.pos.y = (this.pos.y - this.r) % world.halfwidth + world.halfheight + this.r;
   }
 }
 

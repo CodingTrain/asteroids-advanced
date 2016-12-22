@@ -25,18 +25,21 @@ function EntityManager() {
       var playerPos = world.getLocalPlayer().getEntity().pos;
       var relPos = p5.Vector.sub(entity.pos, playerPos);
 
+      var halfWinWid = windowWidth / 2;
+      var halfWinHig = windowHeight / 2
+
       var trans = createVector(0, 0);
-      if (relPos.x - entity.r > windowWidth / 2) trans.x -= world.width;
-      else if (relPos.x + entity.r < -windowWidth / 2) trans.x += world.width;
-      if (relPos.y - entity.r > windowHeight / 2) trans.y -= world.height;
-      else if (relPos.y + entity.r < -windowHeight / 2) trans.y += world.height;
+      if      (relPos.x + world.width  - entity.r <  halfWinWid) trans.x += world.width;
+      else if (relPos.x - world.width  + entity.r > -halfWinWid) trans.x -= world.width;
+      if      (relPos.y + world.height - entity.r <  halfWinHig) trans.y += world.height;
+      else if (relPos.y - world.height + entity.r > -halfWinHig) trans.y -= world.height;
 
       var drawPos = p5.Vector.add(trans, relPos);
       var shouldRender = !(
-        (drawPos.x - entity.r >  windowWidth / 2) ||
-        (drawPos.x + entity.r < -windowWidth / 2) ||
-        (drawPos.y - entity.r >  windowHeight / 2) ||
-        (drawPos.y + entity.r < -windowHeight / 2)
+        (drawPos.x - entity.r >  halfWinWid) ||
+        (drawPos.x + entity.r < -halfWinWid) ||
+        (drawPos.y - entity.r >  halfWinHig) ||
+        (drawPos.y + entity.r < -halfWinHig)
       );
 
       push();

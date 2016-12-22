@@ -63,7 +63,7 @@ function Asteroid(world, params) {
     pop();
   }
 
-  this.collides = function() {}
+  this.collides = function(entity) { }
 
   this.collision = function(entity) {
     if (!this.dead && entity.toString() === "[object Laser]") {
