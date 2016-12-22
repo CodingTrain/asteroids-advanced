@@ -164,7 +164,7 @@ function Ship(world, params) {
     translate(this.pos.x, this.pos.y);
     rotate(this.heading);
     colorMode(RGB);
-    fill(this.colors[this.colorIndex]);
+    noFill();
     strokeWeight(3);
     if (!this.canCollide) {
       strokeCap(ROUND);

@@ -13,7 +13,8 @@ function Asteroid(world, params) {
   Entity.prototype.applyForce.call(this, params.force !== undefined ? params.force : p5.Vector.random2D().mult(5000));
   Entity.prototype.applyTorque.call(this, random(-0.03, 0.03));
   this.heading = params.heading !== undefined ? params.heading : 0;
-  this.c = params.c !== undefined ? params.c : color(126);
+  this.c = params.c !== undefined ? params.c : color(255);
+  const minArea = 600;
 
   vertices = [];
   if (params.vertices === undefined) {
@@ -31,7 +32,7 @@ function Asteroid(world, params) {
   this.shape = new Shape(vertices);
   levelmanager.recordAsteroidCreation();
 
-  if (this.shape.area() > 500) {
+  if (this.shape.area() > minArea) {
     var error = abs((PI - this.shape.area() / (this.r * this.r)) / PI);
     if (error > 0.75) {
       this.canCollide = false;
@@ -50,7 +51,7 @@ function Asteroid(world, params) {
     push();
     strokeWeight(3);
     colorMode(RGB);
-    fill(this.c);
+    noFill(50);
     if (this.canCollide) {
       stroke(255);
     } else {
@@ -69,7 +70,7 @@ function Asteroid(world, params) {
       playSoundEffect(explosionSoundEffects[floor(random(0, explosionSoundEffects.length))]);
 
       this.c = entity.c;
-      if (this.shape.area() < 1200) {
+      if (this.shape.area() < minArea * 2) {
         this.shape.breakAnime();
         this.canCollide = false;
         this.rotation = 0;
