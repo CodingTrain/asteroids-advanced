@@ -4,10 +4,10 @@ function LevelManager(world, level) {
   var score = 0;
   var scope = this;
 
-  this.recordKill = function(asteroid, killerId) {
+  this.recordKill = function(killerId, destroyedArea) {
     asteroids--;
     if (killerId !== -1) {
-      world.getPlayer(killerId).score += floor(asteroid.shape.area() / 100);
+      world.getPlayer(killerId).score += max(0, floor(destroyedArea / 100));
     }
   }
 

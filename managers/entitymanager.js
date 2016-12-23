@@ -35,7 +35,7 @@ function EntityManager() {
       );
 
       push();
-      if (shouldRender) {
+      if (shouldRender && !entity.dead) {
         entity.render();
       }
       pop();
