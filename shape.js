@@ -24,6 +24,17 @@ function Shape(vertices) {
     else return 255 * (1 - this.frame / this.frames);
   }
 
+  this.globalVertices = function(pos, heading) {
+    var glob_vertices = [];
+    for (var i = 0; i < this.vertices.length; i++) {
+      var v = this.vertices[i].copy();
+      v.rotate(heading);
+      v.add(pos);
+      glob_vertices.push(v);
+    }
+    return glob_vertices;
+  }
+
   this.recenter = function() {
     for (var i = 0; i < this.vertices.length; i++) {
       this.vertices[i].sub(this.centroid);
@@ -360,11 +371,11 @@ Shape.makeAsteroidSized = function(shapes) {
   return shapes;
 }
 
-Shape.contains = function(vertices, localPos) {
+Shape.contains = function(vertices, pos) {
   var c = false;
   for (var i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
-    if (((vertices[i].y > localPos.y) != (vertices[j].y > localPos.y)) &&
-      (localPos.x < (vertices[j].x - vertices[i].x) * (localPos.y - vertices[i].y) / (vertices[j].y - vertices[i].y) + vertices[i].x))
+    if (((vertices[i].y > pos.y) != (vertices[j].y > pos.y)) &&
+      (pos.x < (vertices[j].x - vertices[i].x) * (pos.y - vertices[i].y) / (vertices[j].y - vertices[i].y) + vertices[i].x))
       c = !c;
   }
   return c;
