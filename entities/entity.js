@@ -81,11 +81,19 @@ Entity.calculateMoment = function(localPoint, force) {
   return cross(localPoint, force) / localPoint.mag();
 }
 
-Entity.globalPoint = function(scope, localPoint) {
+Entity.prototype.globalPoint = function(localPoint) {
   var point = localPoint.copy();
-  point.rotate(scope.heading);
-  point.add(scope.pos);
+  point.rotate(this.heading);
+  point.add(this.pos);
   return point;
+}
+
+Entity.prototype.globalVertices = function(localVerts) {
+  var globalVerts = [];
+  for (var i = 0; i < localVerts.length; i++) {
+    globalVerts.push(localVerts[i].copy().rotate(this.heading).add(this.pos));
+  }
+  return globalVerts;
 }
 
 Entity.prototype.collides = function(entity) {
