@@ -24,16 +24,20 @@ function EntityManager() {
       var entity = entities[index];
       var playerPos = world.getLocalPlayer().getEntity().pos;
       var relPos = p5.Vector.sub(entity.pos, playerPos);
+      var halfWinWid = windowWidth / 2;
+      var halfWinHig = windowHeight / 2;
 
-      var trans = createVector(0, 0);
-      if (relPos.x - entity.r > windowWidth / 2) trans.x -= world.width;
-      else if (relPos.x + entity.r < -windowWidth / 2) trans.x += world.width;
-      if (relPos.y - entity.r > windowHeight / 2) trans.y -= world.height;
-      else if (relPos.y + entity.r < -windowHeight / 2) trans.y += world.height;
+      var shouldRender = !(
+        (relPos.x - entity.r >  halfWinWid) ||
+        (relPos.x + entity.r < -halfWinWid) ||
+        (relPos.y - entity.r >  halfWinHig) ||
+        (relPos.y + entity.r < -halfWinHig)
+      );
 
       push();
-      translate(trans.x, trans.y);
-      entities[index].render();
+      if (shouldRender) {
+        entity.render();
+      }
       pop();
     }
   }

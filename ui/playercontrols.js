@@ -22,7 +22,7 @@ function PlayerControls(id) {
       keys.left,
       keys.right,
       keys.f,
-      keys.space || keys.space.repeat || keys.leftmouse || keys.leftmouserepeat
+      keys.space || keys.spacerepeat || keys.leftmouse || keys.leftmouserepeat
     );
     keys.space = false;
     keys.leftmouse = false;
@@ -34,10 +34,10 @@ function PlayerControls(id) {
     textSize(32);
     textAlign(LEFT);
     fill(255);
-    if (world.getLocalPlayer().getEntity().velMuEnabled) {
-      text("Stabilizers ON", 10, windowHeight - 10);
+    if (world.getLocalPlayer().getEntity().velMu > 0) {
+      text("(FPS: " + floor(frameRate()) + ") Stabilizers ON", 10, windowHeight - 10);
     } else {
-      text("Stabilizers OFF", 10, windowHeight - 10);
+      text("(FPS: " + floor(frameRate()) + ") Stabilizers OFF", 10, windowHeight - 10);
     }
   }
 

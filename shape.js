@@ -284,8 +284,6 @@ function Shape(vertices) {
 
     } else if (this.frame < this.frames) {
 
-      push();
-
       var hRng = this.speed * 0.5;
       randomSeed(this.seed);
 
@@ -311,8 +309,6 @@ function Shape(vertices) {
         pop();
 
       }
-
-      pop();
 
       this.frame++;
 
