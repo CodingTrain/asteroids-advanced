@@ -3,8 +3,9 @@ function World(width, height, viewSize) {
   this.height = height;
   this.halfwidth = width / 2;
   this.halfheight = height / 2;
-  this.seed = millis();
-  this.time = 0;
+  this.time = millis();
+  this.seed = this.time;
+  this.dt = 0;
 
 
   var hud;
@@ -68,6 +69,9 @@ function World(width, height, viewSize) {
 
   // Does all the update logic for this frame.
   this.update = function() {
+    var currentTime = millis();
+    this.dt = (currentTime - this.time) / 1000;
+    this.time = currentTime;
     entitymanager.update();
     entitymanager.checkCollisions();
     levelmanager.update(players);
@@ -85,7 +89,7 @@ function World(width, height, viewSize) {
     push();
     for (var i = 0; i < 500; i++) {
       strokeWeight(0.1 * random(20) + 2);
-      stroke(255 * pow(sin(random(0, PI) + this.time / 80), 2));
+      stroke(255 * pow(sin(random(0, PI) + this.time / 800), 2));
       var star = createVector(
         random(-this.halfwidth, this.halfwidth),
         random(-this.halfheight, this.halfheight)

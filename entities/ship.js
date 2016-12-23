@@ -12,19 +12,19 @@ function Ship(world, params) {
   var respawnFramesReset = 300;
   var respawnFrames;
   this.mass = 1000;
+  var maxThrust = params.maxThrust !== undefined ? params.maxThrust : 720000;
   this.thrustPower = params.thrustPower !== undefined ? params.thrustPower : {
-    forward: 200,
-    backward: 100,
-    left: 180,
-    right: 180,
-    stabilization: 200,
-    rotation: 80
+    forward: maxThrust,
+    backward: maxThrust * 0.5,
+    left: maxThrust * 0.9,
+    right: maxThrust * 0.9,
+    stabilization: maxThrust,
+    rotation: maxThrust * 0.4
   };
-  this.maxThrust = params.maxThrust !== undefined ? params.maxThrust : 100;
   this.coefficients = {
-    velMu: 1 / this.thrustPower.stabilization,
+    velMu: this.calculateMu(this.thrustPower.stabilization),
     rotMu: 0,
-    velDrag: Entity.calculateDragCo(this.maxThrust, 15),
+    velDrag: Entity.calculateDragCo(maxThrust, 1000),
     rotDrag: 0
   }
   this.velMu = this.coefficients.velMu;
@@ -87,9 +87,10 @@ function Ship(world, params) {
 
     var verts = this.globalVertices();
     var asteroid_vertices = entity.globalVertices();
-    for (var i = 0; i < asteroid_vertices.length; i++) {
-      for (var j = 0; j < verts.length; j++) {
-        if (lineIntersect(verts[j], verts[(j + 1) % verts.length], asteroid_vertices[i], asteroid_vertices[(i + 1) % asteroid_vertices.length])) {
+    for (var x = 0, y = verts.length - 1; x < verts.length; y = x++) {
+      if (Shape.contains(asteroid_vertices, verts[x])) return true;
+      for (var i = 0, j = asteroid_vertices.length - 1; i < asteroid_vertices.length; j = i++) {
+        if (lineIntersect(verts[x], verts[y], asteroid_vertices[i], asteroid_vertices[j])) {
           return true;
         }
       }
@@ -196,7 +197,7 @@ function Ship(world, params) {
   }
 
   this.globalVertices = function() {
-    return this.shape.globalVertices(this.pos, this.heading);
+    return Entity.prototype.globalVertices.call(this, this.shape.vertices);
   }
 
   this.toString = function() {

@@ -51,12 +51,12 @@ Entity.prototype.applyTorque = function(torque) {
 }
 
 Entity.prototype.predictVelocity = function() {
-  var accel = this.force.copy().div(this.mass);
+  var accel = this.force.copy().div(this.mass).mult(world.dt);
   return this.vel.copy().add(accel);
 }
 
 Entity.prototype.predictRotation = function() {
-  var rotAccel = this.torque / this.mass;
+  var rotAccel = this.torque / this.mass * world.dt;
   return this.rotation + rotAccel;
 }
 
@@ -81,11 +81,19 @@ Entity.calculateMoment = function(localPoint, force) {
   return cross(localPoint, force) / localPoint.mag();
 }
 
-Entity.globalPoint = function(scope, localPoint) {
+Entity.prototype.globalPoint = function(localPoint) {
   var point = localPoint.copy();
-  point.rotate(scope.heading);
-  point.add(scope.pos);
+  point.rotate(this.heading);
+  point.add(this.pos);
   return point;
+}
+
+Entity.prototype.globalVertices = function(localVerts) {
+  var globalVerts = [];
+  for (var i = 0; i < localVerts.length; i++) {
+    globalVerts.push(localVerts[i].copy().rotate(this.heading).add(this.pos));
+  }
+  return globalVerts;
 }
 
 Entity.prototype.collides = function(entity) {
@@ -153,12 +161,12 @@ Entity.prototype.update = function() {
   }
 
   // Acceleration
-  if (this.force.x != 0 || this.force.y != 0) this.vel.add(this.force.div(this.mass));
+  if (this.force.x != 0 || this.force.y != 0) this.vel.add(this.force.div(this.mass).mult(world.dt));
   // Rotational Acceleration
-  if (this.torque != 0) this.rotation += this.torque / this.mass;
+  if (this.torque != 0) this.rotation += this.torque / this.mass * world.dt;
 
-  this.pos.add(this.vel);
-  this.heading += this.rotation;
+  this.pos.add(this.vel.copy().mult(world.dt));
+  this.heading += this.rotation * world.dt;
 
   this.edges();
   if (this.force.x != 0 || this.force.y != 0) this.force.mult(0);

@@ -34,7 +34,7 @@ function Shape(vertices) {
     }
     return glob_vertices;
   }
-  
+
   this.recenter = function() {
     for (var i = 0; i < this.vertices.length; i++) {
       this.vertices[i].sub(this.centroid);
