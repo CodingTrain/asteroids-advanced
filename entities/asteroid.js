@@ -28,13 +28,14 @@ function Asteroid(world, params) {
     this.shape = new Shape(vertices);
   } else {
     this.shape = params.shape;
+    this.total = this.shape.vertices.length;
     var offset = this.shape.centroid;
     this.pos.add(offset.rotate(this.heading));
     this.shape.recenter();
   }
   
   if(params.debris === true) {
-    this.shape.breakAnime();
+    this.shape.breakAnime(20);
     this.canCollide = false;
     this.rotation = 0;
   }
@@ -53,14 +54,6 @@ function Asteroid(world, params) {
       stroke(red(this.c), green(this.c), blue(this.c), this.shape.fade());
     }
     translate(this.pos.x, this.pos.y);
-    
-    //For debugging
-    if (this.canCollide) {
-      point(0, 0);
-      ellipse(0, 0, this.r*2);
-    }
-    //
-    
     rotate(this.heading);
     if (!this.shape.draw()) this.dead = true;
     pop();
@@ -75,7 +68,7 @@ function Asteroid(world, params) {
       var destroyedArea = 0;
       if (this.shape.area < minArea * 2) {
         this.c = entity.c;
-        this.shape.breakAnime();
+        this.shape.breakAnime(20);
         this.canCollide = false;
         this.rotation = 0;
         destroyedArea = this.shape.area;
