@@ -6,7 +6,7 @@
 function Asteroid(world, params) {
   var levelmanager = params.levelmanager;
   params.pos = params.pos !== undefined ? params.pos : createVector(random(-world.halfwidth, world.halfwidth), random(-world.halfheight, world.halfheight));
-  params.r = params.r !== undefined ? params.r : random(60, 80);
+  params.r = params.r !== undefined ? params.r : random(80, 160);
   params.mass = params.mass !== undefined ? params.mass : PI * params.r * params.r;
   Entity.call(this, params);
   this.vel = params.vel !== undefined ? params.vel : createVector(0, 0);
