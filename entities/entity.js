@@ -28,9 +28,9 @@ Entity.prototype.edges = function() {
     this.pos.x = this.pos.x % world.halfwidth + world.halfwidth;
   }
   if (this.pos.y - this.r > world.halfheight) {
-    this.pos.y = this.pos.y % world.halfwidth - world.halfheight;
+    this.pos.y = this.pos.y % world.halfheight - world.halfheight;
   } else if (this.pos.y + this.r < -world.halfheight) {
-    this.pos.y = this.pos.y % world.halfwidth + world.halfheight;
+    this.pos.y = this.pos.y % world.halfheight + world.halfheight;
   }
   var playerPos = world.getLocalPlayer().getEntity().pos;
   var relPos = p5.Vector.sub(this.pos, playerPos);
