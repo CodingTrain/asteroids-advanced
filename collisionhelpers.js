@@ -51,3 +51,8 @@ function lineIntersectionPoint(p1, p2, p3, p4) {
   var py = (cross(p1, p2) * (p3.y - p4.y) - (p1.y - p2.y) * cross(p3, p4)) / d;
   return createVector(px, py);
 }
+
+//modulo that works with negative numbers because JS is stupid
+function mod(n, m) {
+  return ((n % m) + m) % m;
+}

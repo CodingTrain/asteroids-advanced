@@ -40,7 +40,7 @@ function Laser(world, params) {
       || !Entity.prototype.collides.call(this, entity) || !lineIntersectCircle(this.pos, tail, entity.pos, entity.r)) {
       return false;
     }
-
+    
     var verts = entity.shape.vertices;
     for (var i = 0, j = entity.total - 1; i < entity.total; j = i++)
       if (lineIntersect(Entity.globalPoint(entity, verts[i]), Entity.globalPoint(entity, verts[j]), this.pos, tail)) return true;
