@@ -98,6 +98,12 @@ function World(width, height, viewSize) {
       else if (relPos.y < -windowHeight / 2) star.y += this.height;
       point(star.x, star.y);
     }
+    push();
+    stroke(255);
+    strokeWeight(3);
+    noFill();
+    rect(-world.halfwidth, -world.halfheight, world.width, world.height);
+    pop();
     pop();
     this.time++;
     randomSeed(millis());

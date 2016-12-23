@@ -22,16 +22,24 @@ Entity.prototype.registerId = function(id) {
 }
 
 Entity.prototype.edges = function() {
-  if (this.pos.x + this.r > world.halfwidth) {
-    this.pos.x = (this.pos.x + this.r) % world.halfwidth - world.halfwidth - this.r;
-  } else if (this.pos.x - this.r < -world.halfwidth) {
-    this.pos.x = (this.pos.x - this.r) % world.halfwidth + world.halfwidth + this.r;
+  if (this.pos.x - this.r > world.halfwidth) {
+    this.pos.x = this.pos.x % world.halfwidth - world.halfwidth;
+  } else if (this.pos.x + this.r < -world.halfwidth) {
+    this.pos.x = this.pos.x % world.halfwidth + world.halfwidth;
   }
-  if (this.pos.y + this.r > world.halfheight) {
-    this.pos.y = (this.pos.y + this.r) % world.halfwidth - world.halfheight - this.r;
-  } else if (this.pos.y - this.r < -world.halfheight) {
-    this.pos.y = (this.pos.y - this.r) % world.halfwidth + world.halfheight + this.r;
+  if (this.pos.y - this.r > world.halfheight) {
+    this.pos.y = this.pos.y % world.halfwidth - world.halfheight;
+  } else if (this.pos.y + this.r < -world.halfheight) {
+    this.pos.y = this.pos.y % world.halfwidth + world.halfheight;
   }
+  var playerPos = world.getLocalPlayer().getEntity().pos;
+  var relPos = p5.Vector.sub(this.pos, playerPos);
+  var halfWinWid = windowWidth / 2;
+  var halfWinHig = windowHeight / 2
+  if      (relPos.x + world.width  - this.r <  halfWinWid) this.pos.x += world.width;
+  else if (relPos.x - world.width  + this.r > -halfWinWid) this.pos.x -= world.width;
+  if      (relPos.y + world.height - this.r <  halfWinHig) this.pos.y += world.height;
+  else if (relPos.y - world.height + this.r > -halfWinHig) this.pos.y -= world.height;
 }
 
 Entity.prototype.applyForce = function(force) {
